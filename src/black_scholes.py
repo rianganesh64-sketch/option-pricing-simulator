@@ -59,6 +59,6 @@ if __name__ == "__main__":
         round(black_scholes_call(S, K, T, r, sigma), 2))
     print(
         "Put Price:",
-        round(black_scholes_call(S, K, T, r, sigma), 2)
+        round(black_scholes_put(S, K, T, r, sigma), 2)
     )
 
