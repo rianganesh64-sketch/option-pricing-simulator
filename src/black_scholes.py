@@ -6,7 +6,7 @@ def d_one(S, K, T, r, sigma):
     """
     Calculates d1 used in the Black-Scholes formula.
     """
-    if S < 0 or K < 0 or T <= 0 or sigma <= 0:
+    if S <= 0 or K <= 0 or T <= 0 or sigma <= 0:
         raise ValueError("S, K, T, and sigma must be positive for BlackScholes")
     
     return((np.log(S / K)
@@ -29,7 +29,7 @@ def black_scholes_call(S, K, T, r, sigma):
     """
     return((norm.cdf(d_one(S, K, T, r, sigma)) * S)
            - norm.cdf(d_two(S, K, T, r, sigma))
-           * K * (np.e**((-r)
+           * K * (np.exp((-r)
                                     * T)))
 
 
@@ -39,7 +39,7 @@ def black_scholes_put(S, K, T, r, sigma):
     """
     Calculates Black-Scholes price of a European put option.
     """
-    return(((K) * np.e**(-r * T)
+    return(((K) * np.exp(-r * T)
             * norm.cdf(-d_two(S, K, T, r, sigma))
             - ((S) * norm.cdf(-d_one(S, K, T, r, sigma)))))
 
@@ -61,4 +61,3 @@ if __name__ == "__main__":
         "Put Price:",
         round(black_scholes_put(S, K, T, r, sigma), 2)
     )
-
