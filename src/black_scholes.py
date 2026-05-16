@@ -17,9 +17,7 @@ def d_two(S, K, T, r, sigma):
     """
     Calculates d2 used in the Black-Scholes formula.
     """
-    return((np.log(S / K)
-            + T*(r - ((sigma**2)/2)))
-            / (sigma * np.sqrt(T)))
+    return(d_one(S, K, T, r, sigma) - (sigma * np.sqrt(T)))
 
 #CALL OPTIONS: The right to purchase an asset a a specific strike price
 #Putting it all together with Black-Scholes 
