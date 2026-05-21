@@ -22,7 +22,7 @@ K = 50 # Strike price
 T = 9 / 12 # Time to maturity in years
 r = 0.04 # Risk free interest rate
 sigma = 0.30 # base volatility
-N = 1000 # Number of simulations
+N = 1000000 # Number of simulations
 
 def validate_inputs(S, K, T, r, sigma, N):
     if S <= 0:
@@ -63,6 +63,28 @@ def put_payoffs(S, K, T, r, sigma, N):
     put_payoff_values = np.maximum(K - simulated_prices, 0)
     return(put_payoff_values)
 
+def monte_carlo_call(S, K, T, r, sigma, N):
+    validate_inputs(S, K, T, r, sigma, N)
+    simulated_payoffs = call_payoffs(S, K, T, r, sigma, N)
+    average_payoff = np.mean(simulated_payoffs)
+    price = average_payoff * np.exp(-r * T)
+    return(price)
+
+def monte_carlo_put(S, K, T, r, sigma, N):
+    validate_inputs(S, K, T, r, sigma, N)
+    simulated_payoffs = put_payoffs(S, K, T, r, sigma, N)
+    average_payoff = np.mean(simulated_payoffs)
+    price = average_payoff * np.exp(-r * T)
+    return(price)
+
+def monte_carlo_prices(S, K, T, r, sigma, N, option_type):
+    if option_type not in ["call", "put"]:
+        raise ValueError("Option type must be either 'call' or 'put'")
+    elif option_type == "call":
+        return(monte_carlo_call(S, K, T, r, sigma, N))
+    else:
+        return(monte_carlo_put(S, K, T, r, sigma, N))
+
 if __name__ == "__main__":
     final_prices = simulate_final_prices(S, K, T, r, sigma, N)
     print("Final prices from GBM")
@@ -82,3 +104,15 @@ if __name__ == "__main__":
     print(np.mean(put_option_payoffs))
     print(np.max(put_option_payoffs))
     print(np.min(put_option_payoffs))
+    print("Monte Carlo call payoff")
+    call_monte_carlo = monte_carlo_call(S, K, T, r, sigma, N)
+    print(call_monte_carlo)
+    print("Monte Carlo put payoff")
+    call_monte_carlo = monte_carlo_put(S, K, T, r, sigma, N)
+    print(call_monte_carlo)
+    print("Full Monte Carlo Function Call")
+    monte_carlo_call_price = monte_carlo_prices(S, K, T, r, sigma, N, "call")
+    print(monte_carlo_call_price)
+    print("Full Monte Carlo Function Put")
+    monte_carlo_put_price = monte_carlo_prices(S, K, T, r, sigma, N, "put")
+    print(monte_carlo_put_price)
