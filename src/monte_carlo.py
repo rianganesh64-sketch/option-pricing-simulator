@@ -16,14 +16,6 @@ import numpy as np
 # 5. standard_error(...)
 #    Measures how noisy/uncertain the Monte Carlo estimate is.
 
-# Initial Test Parameters
-S = 50 # Initial stock price
-K = 50 # Strike price
-T = 9 / 12 # Time to maturity in years
-r = 0.04 # Risk free interest rate
-sigma = 0.30 # base volatility
-N = 1000000 # Number of simulations
-
 def validate_inputs(S, K, T, r, sigma, N):
     if S <= 0:
         raise ValueError("S (initial stock price) must be positive")
@@ -85,7 +77,20 @@ def monte_carlo_prices(S, K, T, r, sigma, N, option_type):
     else:
         return(monte_carlo_put(S, K, T, r, sigma, N))
 
+def error(S, K, T, r, sigma, N):
+    validate_inputs(S, K, T, r, sigma, N)
+    results = simulate_final_prices(S, K, T, r, sigma, N)
+    standard_error = np.std(results) / np.sqrt(len(results))
+    return(standard_error)
+
 if __name__ == "__main__":
+    # Initial Test Parameters
+    S = 50 # Initial stock price
+    K = 50 # Strike price
+    T = 9 / 12 # Time to maturity in years
+    r = 0.04 # Risk free interest rate
+    sigma = 0.30 # base volatility
+    N = 10000000 # Number of simulations
     final_prices = simulate_final_prices(S, K, T, r, sigma, N)
     print("Final prices from GBM")
     print(final_prices[:5])
@@ -116,3 +121,6 @@ if __name__ == "__main__":
     print("Full Monte Carlo Function Put")
     monte_carlo_put_price = monte_carlo_prices(S, K, T, r, sigma, N, "put")
     print(monte_carlo_put_price)
+    print("Standard Error Calculations")
+    std_error = error(S, K, T, r, sigma, N)
+    print(std_error)
