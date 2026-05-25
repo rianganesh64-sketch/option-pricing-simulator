@@ -1,22 +1,8 @@
 import numpy as np
 
-# 1. validate_inputs(...)
-#    Makes sure S, K, T, sigma, and N are valid.
-
-# 2. simulate_final_prices(...)
-#    Generates N random Z values.
-#    Uses GBM to produce N possible final stock prices.
-
-# 3. call_payoffs(...) / put_payoffs(...)
-#    Converts simulated stock prices into option payoffs.
-
-# 4. monte_carlo_call(...) / monte_carlo_put(...)
-#    Averages the payoffs and discounts them back to present value.
-
-# 5. standard_error(...)
-#    Measures how noisy/uncertain the Monte Carlo estimate is.
-
 def validate_inputs(S, K, T, r, sigma, N):
+    """Validates the given inputs for the Monte Carlo simulation, raises a ValueError if needed
+    Can be easily used in other functions to validate inputs"""
     if S <= 0:
         raise ValueError("S (initial stock price) must be positive")
     if K <= 0:
@@ -33,6 +19,7 @@ def validate_inputs(S, K, T, r, sigma, N):
         raise ValueError ('N (number of simulations) must be positive')
 
 def simulate_final_prices(S, K, T, r, sigma, N):
+    """Uses Geometric Brownian Motion and random standard normal shocks to simulate N possible future stock prices."""
     validate_inputs(S, K, T, r, sigma, N)
 
     rng = np.random.default_rng(seed=42)
@@ -44,18 +31,21 @@ def simulate_final_prices(S, K, T, r, sigma, N):
     return(final_prices)
 
 def call_payoffs(S, K, T, r, sigma, N):
+    """Calculates the call option payoffs for the simulated stock prices"""
     validate_inputs(S, K, T, r, sigma, N)
     simulated_prices = simulate_final_prices(S, K, T, r, sigma, N)
     call_payoff_values = np.maximum(simulated_prices - K, 0)
     return(call_payoff_values)
 
 def put_payoffs(S, K, T, r, sigma, N):
+    """Calculates the put option payoffs for the simulated stock prices"""
     validate_inputs(S, K, T, r, sigma, N)
     simulated_prices = simulate_final_prices(S, K, T, r, sigma, N)
     put_payoff_values = np.maximum(K - simulated_prices, 0)
     return(put_payoff_values)
 
 def monte_carlo_call(S, K, T, r, sigma, N):
+    """Discounts the payoff for call options back to the present for a better estimate of value"""
     validate_inputs(S, K, T, r, sigma, N)
     simulated_payoffs = call_payoffs(S, K, T, r, sigma, N)
     average_payoff = np.mean(simulated_payoffs)
@@ -63,13 +53,16 @@ def monte_carlo_call(S, K, T, r, sigma, N):
     return(price)
 
 def monte_carlo_put(S, K, T, r, sigma, N):
+    """Discounts the payoff for put options back to the present for a better estimate of value"""
     validate_inputs(S, K, T, r, sigma, N)
     simulated_payoffs = put_payoffs(S, K, T, r, sigma, N)
     average_payoff = np.mean(simulated_payoffs)
     price = average_payoff * np.exp(-r * T)
     return(price)
 
-def monte_carlo_prices(S, K, T, r, sigma, N, option_type):
+def monte_carlo_price(S, K, T, r, sigma, N, option_type):
+    validate_inputs(S, K, T, r, sigma, N)
+    """A container function for the monte_carlo_put and monte_carlo_call functions, returns the correct output based on option_type"""
     if option_type not in ["call", "put"]:
         raise ValueError("Option type must be either 'call' or 'put'")
     elif option_type == "call":
@@ -77,11 +70,17 @@ def monte_carlo_prices(S, K, T, r, sigma, N, option_type):
     else:
         return(monte_carlo_put(S, K, T, r, sigma, N))
 
-def error(S, K, T, r, sigma, N):
+def standard_error(S, K, T, r, sigma, N, option_type):
+    """Calculates the standard error of the Monte Carlo simulation."""
     validate_inputs(S, K, T, r, sigma, N)
-    results = simulate_final_prices(S, K, T, r, sigma, N)
-    standard_error = np.std(results) / np.sqrt(len(results))
-    return(standard_error)
+    if option_type not in ["call", "put"]:
+        raise ValueError("Option type must be either 'call' or 'put'")
+    elif option_type == "put":
+        payoff = put_payoffs(S, K, T, r, sigma, N)
+    else:
+        payoff = call_payoffs(S, K, T, r, sigma, N)
+    error = np.std(payoff, ddof = 1) / np.sqrt(len(payoff)) # uses sample standard deviation formula, ddof = 1
+    return(error)
 
 if __name__ == "__main__":
     # Initial Test Parameters
@@ -90,7 +89,7 @@ if __name__ == "__main__":
     T = 9 / 12 # Time to maturity in years
     r = 0.04 # Risk free interest rate
     sigma = 0.30 # base volatility
-    N = 10000000 # Number of simulations
+    N = 1000 # Number of simulations
     final_prices = simulate_final_prices(S, K, T, r, sigma, N)
     print("Final prices from GBM")
     print(final_prices[:5])
@@ -116,11 +115,13 @@ if __name__ == "__main__":
     call_monte_carlo = monte_carlo_put(S, K, T, r, sigma, N)
     print(call_monte_carlo)
     print("Full Monte Carlo Function Call")
-    monte_carlo_call_price = monte_carlo_prices(S, K, T, r, sigma, N, "call")
+    monte_carlo_call_price = monte_carlo_price(S, K, T, r, sigma, N, "call")
     print(monte_carlo_call_price)
     print("Full Monte Carlo Function Put")
-    monte_carlo_put_price = monte_carlo_prices(S, K, T, r, sigma, N, "put")
+    monte_carlo_put_price = monte_carlo_price(S, K, T, r, sigma, N, "put")
     print(monte_carlo_put_price)
     print("Standard Error Calculations")
-    std_error = error(S, K, T, r, sigma, N)
-    print(std_error)
+    std_error_put = standard_error(S, K, T, r, sigma, N, "put")
+    std_error_call = standard_error(S, K, T, r, sigma, N, "call")
+    print(std_error_put)
+    print(std_error_call)
