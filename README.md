@@ -86,3 +86,48 @@ option-pricing-simulator/
 ├── requirements.txt
 ├── README.md
 └── .gitignore
+
+## How to Run the Project
+
+Follow these steps to run the Option Pricing Simulator on your computer.
+**Project has not been completed yet, but this will be true once finished**
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/option-pricing-simulator.git
+cd option-pricing-simulator
+```
+
+Replace `your-username` with your actual GitHub username.
+
+### 2. Install Dependencies
+
+Make sure Python is installed on your computer. Then install the required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run the Program
+
+Start the simulator by running:
+
+```bash
+python app.py
+```
+
+### 4. Enter Option Parameters
+
+When the program starts, enter the requested values, such as:
+
+```text
+Current stock price: 100
+Strike price: 105
+Time to expiration: 1
+Risk-free interest rate: 0.05
+Volatility: 0.2
+Number of simulations: 10000
+```
+
+The simulator will then calculate and display the Black-Scholes price, Monte Carlo estimate, and simulated stock price paths.
