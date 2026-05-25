@@ -91,13 +91,13 @@ option-pricing-simulator/
 
 Follow these steps to run the Option Pricing Simulator on your computer.
 **Project has not been completed yet, but this will be true once finished**
+```
 
 ### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/option-pricing-simulator.git
 cd option-pricing-simulator
-```
 
 Replace `your-username` with your actual GitHub username.
 
