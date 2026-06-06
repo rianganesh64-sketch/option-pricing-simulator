@@ -1,5 +1,5 @@
 import time
-from src.black_scholes import black_scholes_call, black_scholes_put
+from src.black_scholes import black_scholes_call, black_scholes_put, black_scholes_price
 from src.monte_carlo import monte_carlo_price
 from src.gbm import generate_gbm_paths
 # python -m src.utils
@@ -21,6 +21,12 @@ def measure_runtime(function_to_time, *args, **kwargs):
     execution_time = end_time - start_time
     print(f"Function runtime: {execution_time:.6f} seconds")
     return result, execution_time
+
+def absolute_error(S, K, T, r, sigma, N, option_type):
+    bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
+    mc_price = monte_carlo_price(S, K, T, r, sigma, N, option_type)
+    abs_error = abs(bs_price - mc_price)
+    return abs_error
 
 #temporary test cases
 if __name__ == "__main__":
@@ -62,3 +68,6 @@ if __name__ == "__main__":
         generate_gbm_paths, 100, 1, 0.04, 0.05, 252, 10, seed=42
     )
     print(result)
+    print("\ntesting absolute error function:")
+    print(absolute_error(110, 100, 1, 0.04, 0.05, 10, "call"))
+    print(absolute_error(100, 10, 1, 0.05, 0.05, 10000, "call"))

@@ -42,6 +42,14 @@ def black_scholes_put(S, K, T, r, sigma):
             - ((S) * norm.cdf(-d_one(S, K, T, r, sigma)))))
 
 
+def black_scholes_price(S, K, T, r, sigma, option_type):
+    if option_type == "call":
+       return black_scholes_call(S, K, T, r, sigma)
+    elif option_type == "put":
+       return black_scholes_put(S, K, T, r, sigma)
+    else:
+        raise ValueError("option_type must either be 'call' or 'put'")
+    
 #Temporary test case
 if __name__ == "__main__":
     S = 100 # current stock price
@@ -59,3 +67,6 @@ if __name__ == "__main__":
         "Put Price:",
         round(black_scholes_put(S, K, T, r, sigma), 2)
     )
+    print("Testing black_scholes_price function:")
+    print(f"For call: {round(black_scholes_price(S, K, T, r, sigma, "call"), 2)} ")
+    print(f"For put: {round(black_scholes_price(S, K, T, r, sigma, "put"), 2)} ")
