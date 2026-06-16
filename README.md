@@ -4,8 +4,6 @@ An interactive Python simulator that compares **Black-Scholes** and **Monte Carl
 
 This project is designed to make European option pricing easier to understand by combining financial math, simulation, and data visualization in a simple educational tool.
 
-Project for FOCS SMCS 9 Class.
-
 ---
 
 ## Overview
