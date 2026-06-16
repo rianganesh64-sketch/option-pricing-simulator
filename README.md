@@ -1,35 +1,43 @@
 # Option Pricing Simulator
 
-An interactive Python simulator that compares **Black-Scholes** and **Monte Carlo** option pricing models while visualizing possible future stock price paths using **Geometric Brownian Motion (GBM)**.
+## Purpose
 
-This project is designed to make European option pricing easier to understand by combining financial math, simulation, and data visualization in a simple educational tool.
+Option Pricing Simulator is a Python project that explores how financial options are valued. The project implements multiple pricing methods and stock-price simulations to help users understand the mathematics behind option pricing.
+
+The goal of the project is to make advanced financial concepts more accessible by combining mathematical models, simulation techniques, and software engineering principles into a single educational tool.
 
 ---
 
-## Overview
+## Current Status
 
-Options are financial contracts whose value depends on the price of an underlying asset, such as a stock. This simulator allows users to enter option parameters and compare how different pricing methods estimate the value of a European call or put option.
+This submission contains the computational backend of the project. The core pricing and simulation engines have been completed and tested.
 
-The project currently focuses on:
+The following components are currently implemented:
 
 - Black-Scholes option pricing
-- Monte Carlo simulation
-- Geometric Brownian Motion stock path simulation
-- European call and put options
-- Visual comparison of simulated stock paths
-- Educational explanations of the results
+- Monte Carlo option pricing
+- Geometric Brownian Motion (GBM) stock-price path generation
+- Input validation
+- Runtime measurement
+- Error analysis
+- Automated unit tests
+
+A future version of the project will include a Streamlit-based graphical user interface featuring interactive visualizations, tutorials, and educational quizzes.
 
 ---
 
-## Features
+## What the Program Accomplishes
 
-- Calculates European call and put option prices using the Black-Scholes formula
-- Estimates option prices using Monte Carlo simulation
-- Simulates possible stock price paths using Geometric Brownian Motion
-- Compares pricing results between analytical and simulation-based methods
-- Displays graphs of simulated stock movement
-- Includes input validation for unrealistic or invalid values
-- Provides an educational interface for users learning about option pricing
+The project can:
+
+- Calculate European call option prices using the Black-Scholes model
+- Calculate European put option prices using the Black-Scholes model
+- Estimate option prices using Monte Carlo simulation
+- Generate realistic stock-price paths using Geometric Brownian Motion
+- Compare analytical and simulation-based pricing methods
+- Measure execution time of different pricing methods
+- Calculate absolute and percentage pricing errors
+- Validate user inputs and handle invalid values safely
 
 ---
 
@@ -37,30 +45,96 @@ The project currently focuses on:
 
 ### Black-Scholes Model
 
-The Black-Scholes model is a mathematical formula used to estimate the fair price of a European option. It assumes that stock prices follow a continuous-time stochastic process and uses inputs such as stock price, strike price, volatility, time to expiration, and risk-free interest rate.
+The Black-Scholes model is an analytical formula used to estimate the fair value of European options. It uses the current stock price, strike price, time to expiration, risk-free interest rate, and volatility.
 
 ### Monte Carlo Simulation
 
-Monte Carlo simulation estimates an option price by generating many possible future stock prices, calculating the option payoff for each outcome, and averaging the discounted payoff.
+Monte Carlo simulation estimates option values by generating many possible future stock prices and averaging the resulting option payoffs.
 
-### Geometric Brownian Motion
+### Geometric Brownian Motion (GBM)
 
-Geometric Brownian Motion is used to model possible future stock price paths. It includes both a deterministic trend and a random component to reflect uncertainty in the market.
+Geometric Brownian Motion is a stochastic process commonly used to model stock prices. It combines deterministic growth with random market fluctuations.
 
 ---
 
 ## Inputs
 
-The simulator uses the following inputs:
+The pricing models use the following variables:
 
 | Variable | Meaning |
-|---|---|
+|----------|----------|
 | `S` | Current stock price |
 | `K` | Strike price |
-| `T` | Time to expiration in years |
+| `T` | Time to expiration (years) |
 | `r` | Risk-free interest rate |
-| `sigma` | Volatility of the stock |
+| `sigma` | Stock volatility |
 | `N` | Number of Monte Carlo simulations |
+
+---
+
+## How the Project Works
+
+1. The user provides option parameters.
+2. The Black-Scholes model calculates an analytical option price.
+3. Monte Carlo simulation generates thousands of possible future stock prices.
+4. Option payoffs are calculated for each simulated outcome.
+5. The average discounted payoff is used to estimate the option's value.
+6. Geometric Brownian Motion generates possible stock-price paths.
+7. Utility functions compare results and measure performance.
+
+---
+
+## Class Concepts Demonstrated
+
+This project demonstrates many topics covered in class:
+
+### Branching and Iteration
+- Input validation using conditional statements
+- Monte Carlo simulation loops
+- GBM stock-path generation loops
+
+### Functions and Decomposition
+- Separate functions for pricing, simulations, validation, error analysis, and utilities
+- Modular design across multiple files
+
+### Abstraction
+- Complex mathematical calculations are hidden behind simple function interfaces
+
+### Lists, Mutability, and Cloning
+- Stock-price paths are stored as lists
+- Multiple independent GBM paths are generated without aliasing issues
+
+### Testing and Debugging
+- Comprehensive pytest test suites
+- Verification of pricing formulas and simulations
+
+### Exceptions and Assertions
+- Invalid inputs raise `ValueError` exceptions
+- Unit tests use assertions to verify correctness
+
+### Imports and Modules
+- Project organized into reusable Python modules
+
+---
+
+## New Concepts Learned
+
+Several concepts used in this project were learned specifically for this assignment:
+
+### Monte Carlo Simulation
+The most significant new concept. Monte Carlo simulation uses repeated randomized trials to estimate a mathematical quantity.
+
+### Geometric Brownian Motion
+A stochastic process used to model stock-price movement over time.
+
+### NumPy
+Used for efficient numerical calculations and vectorized operations.
+
+### Unit Testing with Pytest
+Used to automatically verify that functions behave correctly.
+
+### Runtime Measurement
+Used Python's `time.perf_counter()` function to measure execution speed.
 
 ---
 
@@ -73,59 +147,73 @@ option-pricing-simulator/
 │   ├── black_scholes.py
 │   ├── monte_carlo.py
 │   ├── gbm.py
+│   ├── utils.py
 │   └── __init__.py
 │
 ├── tests/
 │   ├── test_black_scholes.py
 │   ├── test_monte_carlo.py
-│   └── test_gbm.py
+│   ├── test_gbm.py
+│   └── test_utils.py
 │
-├── app.py
 ├── requirements.txt
 ├── README.md
 └── .gitignore
-
-## How to Run the Project
-
-Follow these steps to run the Option Pricing Simulator on your computer.
-**Project has not been completed yet, but this will be true once finished**
 ```
 
-### 1. Clone the Repository
+---
 
-```bash
-git clone https://github.com/your-username/option-pricing-simulator.git
-cd option-pricing-simulator
+## How to Use the Current Version
 
-Replace `your-username` with your actual GitHub username.
-
-### 2. Install Dependencies
-
-Make sure Python is installed on your computer. Then install the required packages:
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run the Program
-
-Start the simulator by running:
+### Run All Tests
 
 ```bash
-python app.py
+python -m pytest
 ```
 
-### 4. Enter Option Parameters
+### Run Individual Test Files
 
-When the program starts, enter the requested values, such as:
-
-```text
-Current stock price: 100
-Strike price: 105
-Time to expiration: 1
-Risk-free interest rate: 0.05
-Volatility: 0.2
-Number of simulations: 10000
+```bash
+python -m pytest tests/test_black_scholes.py
+python -m pytest tests/test_monte_carlo.py
+python -m pytest tests/test_gbm.py
+python -m pytest tests/test_utils.py
 ```
 
-The simulator will then calculate and display the Black-Scholes price, Monte Carlo estimate, and simulated stock price paths.
+### Run Demonstration Code
+
+```bash
+python -m src.utils
+```
+
+The demonstration code executes examples of the implemented pricing models, simulations, and utility functions.
+
+### For a deeper look into any of the functions, run individual files
+
+```bash
+python -m src.black_scholes
+python -m src.gbm
+python -m src.monte_carlo
+```
+
+### Experimenting with the Models
+
+Feel free to modify the input values in the demonstration code to observe how changes in stock price, volatility, time to expiration, or interest rates affect option prices and simulated stock paths!
+
+---
+
+## Future Improvements
+
+Planned future additions include:
+
+- Interactive Streamlit graphical user interface
+- GBM stock-path visualizations
+- Educational tutorials explaining financial concepts
+- Scenario-based option trading quizzes
+- Enhanced user customization and analysis tools
