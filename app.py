@@ -1,14 +1,17 @@
 import streamlit as st
 
-from pages.tutorial import display_tutorial
-from pages.simulator import display_simulator
-from pages.quiz import display_quiz
-from pages.resources import display_resources
+from ui_pages.tutorial import display_tutorial
+from ui_pages.simulator import display_simulator
+from ui_pages.quiz import display_quiz
+from ui_pages.resources import display_resources
 
 if "page" not in st.session_state:
     st.session_state.page = "main"
 
+st.set_page_config(layout="wide")
+
 def display_main():
+    st.set_page_config(layout="wide")
     st.title("Welcome to Option-Pricing-Simulator", text_alignment="center")
     col1, col2 = st.columns(2)
     col1.header("Rian Ganesh", text_alignment="center")
