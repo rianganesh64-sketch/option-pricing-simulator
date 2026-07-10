@@ -1,11 +1,12 @@
 import streamlit as st
-
+from src.black_scholes import black_scholes_price
+from src.utils import format_currency
 def display_simulator():
     st.markdown(
     """
     <style>
         .vertical-divider {
-            border-left: 2px solid #fafafa;
+            border-left: 2px solid #0e1117; 
             height: 1000px;
             margin: 0 auto;
         }
@@ -13,6 +14,7 @@ def display_simulator():
     """,
     unsafe_allow_html=True
 )
+    #temporarily blacking out border to see how it looks, will change back if necessary
     col1, col2, col3, col4 = st.columns(4, border=False)
     with col1:
         if st.button("Tutorial", use_container_width=True, type="tertiary"):
@@ -35,43 +37,52 @@ def display_simulator():
     st.space("medium")
     input_col, divider_col, output_col = st.columns([1.2, 0.05, 2.5])
     with input_col:
-        st.header("Inputs", text_alignment="center")
-        st.space("medium")
-        stock_input = st.number_input(
-            "Enter Current Stock Price:", min_value = 0.01, value=100.00)
-        st.write("Entered Stock Price: ", stock_input)
-        st.space("xxsmall")
-        strike_input = st.number_input(
-            "Enter Option Strike Price:", min_value = 0.01, value=110.00
-        )
-        st.write("Entered Strike Price:", strike_input)
-        st.space("xxsmall")
-        exp_time = st.slider("How long until the Option expires? (months)", 1, 60, value=12)
-        st.write("Entered Time Till Expiration:", exp_time)
-        st.space("xxsmall")
-        volatility = st.slider("Stock Volatility (%):", 0, 100, value=15)
-        st.write("Entered Stock Volatility:", volatility,"%")
-        st.space("xxsmall")
-        risk_free_rate_input = st.slider("Risk-free Rate (%)", 0.00, 15.00, step=0.25)
-        st.write("Entered Risk-free rate:", risk_free_rate_input,"%")
-        st.space("xxsmall")
-        num_simulations = st.slider("Number of Monte-carlo simulations", 10, 10000, step = 50)
-        st.write("Entered Number of Simulations:", num_simulations)
-        st.caption("Lower simulation counts usually create noisier, less stable estimates. More simulations can improve accuracy, but they also take longer to run. Try changing this value and see what happens!", text_alignment="center")
-        st.space("xxsmall")
-        option_type = st.radio(
-            "Call or Put Option?:",
-            ["**Call**", "**Put**"],
-            horizontal=True
-        )
-        st.space("xxsmall")
-        run_bs = st.button("Run Black-Scholes", use_container_width=True)
-        run_mc = st.button("Run Monte Carlo Simulation", use_container_width=True)
+        with st.form("pricing form"):
+            st.header("Inputs", text_alignment="center")
+            st.space("medium")
+            stock_input = st.number_input(
+                "Enter Current Stock Price:", min_value = 0.01, value=100.00)
+            st.write("Entered Stock Price: ", stock_input)
+            st.space("xxsmall")
+            strike_input = st.number_input(
+                "Enter Option Strike Price:", min_value = 0.01, value=110.00
+            )
+            st.write("Entered Strike Price:", strike_input)
+            st.space("xxsmall")
+            exp_time = st.slider("How long until the Option expires? (months)", 1, 60, value=12)
+            st.write("Entered Time Till Expiration:", exp_time)
+            st.space("xxsmall")
+            volatility = st.slider("Stock Volatility (%):", 0, 100, value=15)
+            st.write("Entered Stock Volatility:", volatility,"%")
+            st.space("xxsmall")
+            risk_free_rate_input = st.slider("Risk-free Rate (%)", 0.00, 15.00, step=0.25)
+            st.write("Entered Risk-free rate:", risk_free_rate_input,"%")
+            st.space("xxsmall")
+            num_simulations = st.slider("Number of Monte-carlo simulations", 10, 10000, step = 50)
+            st.write("Entered Number of Simulations:", num_simulations)
+            st.caption("Lower simulation counts usually create noisier, less stable estimates. More simulations can improve accuracy, but they also take longer to run. Try changing this value and see what happens!", text_alignment="center")
+            st.space("xxsmall")
+            selected_option = st.radio(
+                "Call or Put Option?:",
+                ["Call", "Put"],
+                horizontal=True
+            )
+            st.space("xxsmall")
+            submitted = st.form_submit_button("Run Black Scholes")
+        # if submitted==True:
+        #     S = stock_input
+        #     K = strike_input
+        #     T = exp_time/12
+        #     r = risk_free_rate_input/100
+        #     sigma = volatility/100
+        #     option_type = selected_option.strip().lower()
+        #     bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
+        #     st.subheader(f"Option Price Calculated by Black-Scholes: {format_currency(bs_price)}", text_alignment="center")
 
-        if run_bs:
-            st.write("Black-scholes button clicked")
-        if run_mc:
-            st.write("Monte-carlo button clicked")
+            #convert ui values
+            #call black-scholes function
+            #store results
+    
     with divider_col:
       st.html(
           """
@@ -82,6 +93,14 @@ def display_simulator():
         st.space("medium")
         st.header("GBM graphs go here", text_alignment="center")
         st.space("medium")
-        st.write("black-scholes price goes here: (formatting functions used)")
+        if submitted==True:
+            S = stock_input
+            K = strike_input
+            T = exp_time/12
+            r = risk_free_rate_input/100
+            sigma = volatility/100
+            option_type = selected_option.strip().lower()
+            bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
+            st.subheader(f"Option Price Calculated by Black-Scholes: {format_currency(bs_price)}", text_alignment="left")
         st.write("monte_carlo price goes here: (formatting functions used)")
 
