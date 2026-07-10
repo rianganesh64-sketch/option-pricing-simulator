@@ -1,6 +1,7 @@
 import streamlit as st
 from src.black_scholes import black_scholes_price
-from src.utils import format_currency
+from src.monte_carlo import monte_carlo_price
+from src.utils import format_currency, absolute_error, percent_error, measure_runtime, format_percent
 def display_simulator():
     st.markdown(
     """
@@ -13,7 +14,14 @@ def display_simulator():
     </style>
     """,
     unsafe_allow_html=True
-)
+    )
+    if "bs_price" not in st.session_state:
+        st.session_state.bs_price = None
+    
+    if "mc_price" not in st.session_state:
+        st.session_state.mc_price = None
+    if "mc_runtime" not in st.session_state:
+        st.session_state.mc_runtime = None
     #temporarily blacking out border to see how it looks, will change back if necessary
     col1, col2, col3, col4 = st.columns(4, border=False)
     with col1:
@@ -58,7 +66,7 @@ def display_simulator():
             risk_free_rate_input = st.slider("Risk-free Rate (%)", 0.00, 15.00, step=0.25)
             st.write("Entered Risk-free rate:", risk_free_rate_input,"%")
             st.space("xxsmall")
-            num_simulations = st.slider("Number of Monte-carlo simulations", 10, 10000, step = 50)
+            num_simulations = st.slider("Number of Monte-carlo simulations", 100, 100000, step = 100)
             st.write("Entered Number of Simulations:", num_simulations)
             st.caption("Lower simulation counts usually create noisier, less stable estimates. More simulations can improve accuracy, but they also take longer to run. Try changing this value and see what happens!", text_alignment="center")
             st.space("xxsmall")
@@ -68,20 +76,8 @@ def display_simulator():
                 horizontal=True
             )
             st.space("xxsmall")
-            submitted = st.form_submit_button("Run Black Scholes")
-        # if submitted==True:
-        #     S = stock_input
-        #     K = strike_input
-        #     T = exp_time/12
-        #     r = risk_free_rate_input/100
-        #     sigma = volatility/100
-        #     option_type = selected_option.strip().lower()
-        #     bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
-        #     st.subheader(f"Option Price Calculated by Black-Scholes: {format_currency(bs_price)}", text_alignment="center")
-
-            #convert ui values
-            #call black-scholes function
-            #store results
+            submitted_bs = st.form_submit_button("Run Black Scholes")
+            submitted_mc = st.form_submit_button("Run Monte Carlo Simulation")
     
     with divider_col:
       st.html(
@@ -93,7 +89,7 @@ def display_simulator():
         st.space("medium")
         st.header("GBM graphs go here", text_alignment="center")
         st.space("medium")
-        if submitted==True:
+        if submitted_bs==True:
             S = stock_input
             K = strike_input
             T = exp_time/12
@@ -101,6 +97,35 @@ def display_simulator():
             sigma = volatility/100
             option_type = selected_option.strip().lower()
             bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
-            st.subheader(f"Option Price Calculated by Black-Scholes: {format_currency(bs_price)}", text_alignment="left")
-        st.write("monte_carlo price goes here: (formatting functions used)")
+            st.session_state.bs_price = bs_price
+        st.space("medium")
+        if submitted_mc==True:
+            S = stock_input
+            K = strike_input
+            T = exp_time/12
+            r = risk_free_rate_input/100
+            sigma = volatility/100
+            N = num_simulations
+            option_type = selected_option.strip().lower()
+            result, execution_time = measure_runtime(
+                monte_carlo_price, S, K, T, r, sigma, N, option_type)
+            st.session_state.mc_price = result
+            st.session_state.mc_runtime = round(execution_time, 6)
+        if st.session_state.bs_price is not None:
+            st.subheader(f"Option Price Calculated by Black-Scholes: {format_currency(st.session_state.bs_price)}", text_alignment="left")
+        if st.session_state.mc_price is not None:
+            st.subheader(f"Option Price Calculated by Monte Carlo Simulation: {format_currency(st.session_state.mc_price)}", text_alignment="left")
+            st.caption(f"Monte Carlo Simulation Runtime: ~{st.session_state.mc_runtime} secs")
+        if st.session_state.bs_price is not None and st.session_state.mc_price is not None:
+            S = stock_input
+            K = strike_input
+            T = exp_time/12
+            r = risk_free_rate_input/100
+            sigma = volatility/100
+            N = num_simulations
+            option_type = selected_option.strip().lower()
 
+            absolute_err = absolute_error(S, K, T, r, sigma, N, option_type)
+            st.write(f"Absolute Error: {round(absolute_err, 2)}")
+            per_error = percent_error(S, K, T, r, sigma, N, option_type)
+            st.write("Percent Error:", format_percent(per_error))
