@@ -10,9 +10,9 @@ The goal of the project is to make advanced financial concepts more accessible b
 
 ## Current Status
 
-This submission contains the computational backend of the project. The core pricing and simulation engines have been completed and tested.
+Backend has been finished. Streamlit-based user interface is currently being worked on. This will feature interactive visualizations, tutorials, educational quizzes, and useful resources.
 
-The following components are currently implemented:
+The following components are fully implemented:
 
 - Black-Scholes option pricing
 - Monte Carlo option pricing
@@ -21,8 +21,6 @@ The following components are currently implemented:
 - Runtime measurement
 - Error analysis
 - Automated unit tests
-
-A future version of the project will include a Streamlit-based graphical user interface featuring interactive visualizations, tutorials, and educational quizzes.
 
 ---
 
@@ -81,60 +79,6 @@ The pricing models use the following variables:
 5. The average discounted payoff is used to estimate the option's value.
 6. Geometric Brownian Motion generates possible stock-price paths.
 7. Utility functions compare results and measure performance.
-
----
-
-## Class Concepts Demonstrated
-
-This project demonstrates many topics covered in class:
-
-### Branching and Iteration
-- Input validation using conditional statements
-- Monte Carlo simulation loops
-- GBM stock-path generation loops
-
-### Functions and Decomposition
-- Separate functions for pricing, simulations, validation, error analysis, and utilities
-- Modular design across multiple files
-
-### Abstraction
-- Complex mathematical calculations are hidden behind simple function interfaces
-
-### Lists, Mutability, and Cloning
-- Stock-price paths are stored as lists
-- Multiple independent GBM paths are generated without aliasing issues
-
-### Testing and Debugging
-- Comprehensive pytest test suites
-- Verification of pricing formulas and simulations
-
-### Exceptions and Assertions
-- Invalid inputs raise `ValueError` exceptions
-- Unit tests use assertions to verify correctness
-
-### Imports and Modules
-- Project organized into reusable Python modules
-
----
-
-## New Concepts Learned
-
-Several concepts used in this project were learned specifically for this assignment:
-
-### Monte Carlo Simulation
-The most significant new concept. Monte Carlo simulation uses repeated randomized trials to estimate a mathematical quantity.
-
-### Geometric Brownian Motion
-A stochastic process used to model stock-price movement over time.
-
-### NumPy
-Used for efficient numerical calculations and vectorized operations.
-
-### Unit Testing with Pytest
-Used to automatically verify that functions behave correctly.
-
-### Runtime Measurement
-Used Python's `time.perf_counter()` function to measure execution speed.
 
 ---
 
@@ -202,18 +146,13 @@ python -m src.gbm
 python -m src.monte_carlo
 ```
 
+### Run Streamlit Interface
+
+```bash
+streamlit run app.py
+```
 ### Experimenting with the Models
 
 Feel free to modify the input values in the demonstration code to observe how changes in stock price, volatility, time to expiration, or interest rates affect option prices and simulated stock paths!
 
 ---
-
-## Future Improvements
-
-Planned future additions include:
-
-- Interactive Streamlit graphical user interface
-- GBM stock-path visualizations
-- Educational tutorials explaining financial concepts
-- Scenario-based option trading quizzes
-- Enhanced user customization and analysis tools
