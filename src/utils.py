@@ -22,7 +22,7 @@ def percent_error(reference, experimental):
     if reference == 0:
         return float("inf")
     else:
-        per_error = ((experimental - reference)/reference) * 100
+        per_error = abs(((experimental - reference)/reference)) * 100
     return per_error
 
 def format_currency(c):

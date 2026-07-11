@@ -135,8 +135,8 @@ def display_simulator():
             sigma = volatility/100
             N = num_simulations
             option_type = selected_option.strip().lower()
-            absolute_err = absolute_error(st.session_state.bs_price, st.session_state.mc_price)
-            per_error = percent_error(st.session_state.bs_price, st.session_state.mc_price)
+            absolute_err = absolute_error(round(st.session_state.bs_price, 2), round(st.session_state.mc_price, 2))
+            per_error = percent_error(round(st.session_state.bs_price, 2), round(st.session_state.mc_price, 2))
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(f"Absolute Error (Difference Between Prices): ${round(absolute_err, 2)}", text_alignment="right")
