@@ -43,3 +43,10 @@ def display_resources():
             st.rerun()
     st.title("resources")
     st.write("Resources content goes here.")
+    st.write("possible resource content" \
+    "- law of large numbers" \
+    "geometric brownian motion" \
+    "monte carlo" \
+    "history on black scholes" \
+    "quantguild")
+    st.header("possible future improvement: have definitions pop-up on anything that is confusing, to prevent unnecessary in app explainations")

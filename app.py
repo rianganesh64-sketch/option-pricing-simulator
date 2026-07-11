@@ -8,7 +8,7 @@ from ui_pages.resources import display_resources
 st.set_page_config(layout="wide")
 
 if "page" not in st.session_state:
-    st.session_state.page = "main"
+    st.session_state.page = "Home"
 
 def display_main():
     st.title("Welcome to Option-Pricing-Simulator", text_alignment="center")
@@ -37,7 +37,7 @@ def display_main():
             st.session_state.page = "Resources"
             st.rerun()
 
-if st.session_state.page == "main":
+if st.session_state.page == "Home":
     display_main()
 elif st.session_state.page == "Tutorial":
     display_tutorial()

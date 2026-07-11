@@ -14,19 +14,15 @@ def measure_runtime(function_to_time, *args, **kwargs):
     print(f"Function runtime: {execution_time:.6f} seconds")
     return result, execution_time
 
-def absolute_error(S, K, T, r, sigma, N, option_type):
-    bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
-    mc_price = monte_carlo_price(S, K, T, r, sigma, N, option_type)
-    abs_error = abs(bs_price - mc_price)
+def absolute_error(price_1, price_2):
+    abs_error = abs(price_1 - price_2)
     return abs_error
 
-def percent_error(S, K, T, r, sigma, N, option_type):
-    abs_error = absolute_error(S, K, T, r, sigma, N, option_type)
-    bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
-    if bs_price == 0:
+def percent_error(reference, experimental):
+    if reference == 0:
         return float("inf")
     else:
-        per_error = (abs_error / bs_price) * 100
+        per_error = ((experimental - reference)/reference) * 100
     return per_error
 
 def format_currency(c):
