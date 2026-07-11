@@ -1,4 +1,4 @@
-# Option Pricing Simulator
+# Option Pricing Simulator (README not up to date)
 
 ## Purpose
 
