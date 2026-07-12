@@ -26,7 +26,6 @@ def display_simulator():
         st.session_state.mc_runtime = None
     if "gbm_paths" not in st.session_state:
         st.session_state.gbm_paths = None
-    #temporarily blacking out border to see how it looks, will change back if necessary
     col1, col2, col3, col4 = st.columns(4, border=False)
     with col1:
         if st.button("Home", use_container_width=True, type="tertiary"):
