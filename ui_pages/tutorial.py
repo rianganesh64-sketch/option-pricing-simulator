@@ -60,13 +60,22 @@ def display_tutorial():
         + "• **Option Type** — Whether the option is a call or a put.",
     },
     {
-        "title": "Strike Price",
-        "body": "The strike price is the fixed price written into the option contract. The difference between the current stock price and the strike price strongly affects the option's value. In real scenarios, choosing the wrong strike price can make an option much less useful.",
-        "definitions": "• **Strike Price** — The fixed price written into the option contract."
-        + "\n\n"
-        + "• **In the Money** — When an option already has value if used immediately."
-        + "\n\n"
-        + "• **Out of the Money** — When an option does not have immediate value.",
+    "title": "Strike Price",
+    "body": "The strike price is the fixed price written into the option contract. For a call option, the strike price is the price where the buyer can buy the stock. For a put option, it is the price where the buyer can sell the stock. The relationship between the stock price and strike price strongly affects the option's value.",
+    "definitions": "• **Strike Price** — The fixed price written into the option contract."
+    + "\n\n"
+    + "• **Stock Price vs Strike Price** — The comparison that helps determine whether an option is in the money or out of the money."
+    + "\n\n"
+    + "• **Option Value** — The estimated worth of the option based on the model and market conditions.",
+    },
+    {
+    "title": "In the Money vs Out of the Money",
+    "body": "Once you know the stock price and strike price, you can tell whether an option is in the money or out of the money. For a call option, it is in the money when the stock price is above the strike price. It is out of the money when the stock price is below the strike price. This matters in the simulator and quiz because it helps you judge how risky or realistic an option trade is.",
+    "definitions": "• **In the Money Call** — A call option where the stock price is above the strike price."
+    + "\n\n"
+    + "• **Out of the Money Call** — A call option where the stock price is below the strike price."
+    + "\n\n"
+    + "• **At the Money** — When the stock price and strike price are very close.",
     },
     {
         "title": "Time to Expiration",
@@ -141,13 +150,13 @@ def display_tutorial():
         + "• **Risk** — The chance that the result is different from what was expected.",
     },
     {
-        "title": "Preparing for the Quiz",
-        "body": "In the quiz, you will see realistic market scenarios. Your job is to read the scenario, think about the stock price, volatility, time, and option type, then decide whether buying or selling the option makes sense. The goal is not to guess perfectly. The goal is to apply the model and explain your reasoning.",
-        "definitions": "• **Scenario** — A realistic situation based on market conditions."
-        + "\n\n"
-        + "• **Decision** — The choice you make after analyzing the information."
-        + "\n\n"
-        + "• **Reasoning** — The explanation behind your choice.",
+    "title": "Preparing for the Quiz",
+    "body": "In the quiz, you will see realistic market scenarios based on real events. Your job is to read the scenario, use the simulator, and decide whether to take the trade or skip it. If you take the trade, you will choose how much of your bank to risk. The goal is not just to be right, but to make smart decisions with risk in mind.",
+    "definitions": "• **Scenario** — A realistic situation based on market conditions."
+    + "\n\n"
+    + "• **Bank** — The amount of money you have available in the quiz."
+    + "\n\n"
+    + "• **Position Size** — How much money you choose to risk on one trade.",
     },
     {
         "title": "Important Limitation",
