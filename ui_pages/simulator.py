@@ -95,6 +95,11 @@ def display_simulator():
           """)
     with output_col:
         st.header("Outputs", text_alignment="center")
+        if submitted_bs==False and submitted_mc==False:
+            st.space('xxlarge')
+            st.subheader("Start changing input values to get started:", text_alignment="center")
+            st.space("large")
+            st.subheader('Click "Run Black Scholes" or "Run Monte Carlo Simulation" to see the outputs!', text_alignment="center")
         if submitted_bs==True:
             S = stock_input
             K = strike_input
@@ -141,7 +146,7 @@ def display_simulator():
                 st.markdown(f"Absolute Error (Difference Between Prices): ${round(absolute_err, 2)}", text_alignment="right")
             with col2:
                 if st.session_state.bs_price == 0.00:
-                    st.markdown("Percent Error: Undefined (Black-Scholes Price is 0)")
+                    st.markdown("Percent Error: Undefined (Black-Scholes Price is 0)", text_alignment="left")
                 else:
                     st.markdown(f"Percent Error: {format_percent(per_error)}", text_alignment="left")
             st.space("medium")
