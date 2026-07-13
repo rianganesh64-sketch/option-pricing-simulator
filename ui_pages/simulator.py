@@ -4,6 +4,7 @@ from src.black_scholes import black_scholes_price
 from src.monte_carlo import monte_carlo_price
 from src.utils import format_currency, absolute_error, percent_error, measure_runtime, format_percent
 from src.gbm import generate_gbm_paths
+from ui_components.navbar import display_nav_bar
 def display_simulator():
     st.markdown(
     """
@@ -26,24 +27,8 @@ def display_simulator():
         st.session_state.mc_runtime = None
     if "gbm_paths" not in st.session_state:
         st.session_state.gbm_paths = None
-    col1, col2, col3, col4 = st.columns(4, border=False)
-    with col1:
-        if st.button("Home", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Home"
-            st.rerun()
-    with col2:
-        if st.button("Tutorial", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Tutorial"
-            st.rerun()
-    with col3:
-        if st.button("Quiz", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Quiz"
-            st.rerun()
-    with col4:
-        if st.button("Resources", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Resources"
-            st.rerun()
-    st.space("medium")
+
+    display_nav_bar("Home", "Tutorial", "Quiz", "Resources")
     st.title("Welcome to the Simulator!", text_alignment="center")
     st.markdown("### Experiment with different option inputs and compare how Black-Scholes and Monte Carlo prices change.", text_alignment="center")
     st.space("small")

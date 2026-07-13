@@ -1,23 +1,8 @@
 import streamlit as st
+from ui_components.navbar import display_nav_bar
 
 def display_tutorial():
-    col1, col2, col3, col4 = st.columns(4, border=False)
-    with col1:
-        if st.button("Home", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Home"
-            st.rerun()
-    with col2:
-        if st.button("Simulator", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Simulator"
-            st.rerun()
-    with col3:
-        if st.button("Quiz", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Quiz"
-            st.rerun()
-    with col4:
-        if st.button("Resources", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Resources"
-            st.rerun()
+    display_nav_bar("Home", "Simulator", "Quiz", "Resources")
     st.space("medium")
     st.title("Start Learning!", text_alignment="center")
     st.markdown(

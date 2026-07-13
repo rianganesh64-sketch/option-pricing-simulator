@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 from src.utils import format_currency
+from ui_components.navbar import display_nav_bar
 
 CSV_PATH = Path("data/real_world_option_quiz_scenarios.csv")
 
@@ -10,23 +11,7 @@ def load_quiz_data():
     return pd.read_csv(CSV_PATH)
 
 def display_quiz():
-    col1, col2, col3, col4 = st.columns(4, border=False)
-    with col1:
-        if st.button("Home", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Home"
-            st.rerun()
-    with col2:
-        if st.button("Tutorial", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Tutorial"
-            st.rerun()
-    with col3:
-        if st.button("Simulator", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Simulator"
-            st.rerun()
-    with col4:
-        if st.button("Resources", use_container_width=True, type="tertiary"):
-            st.session_state.page = "Resources"
-            st.rerun()
+    display_nav_bar("Home", "Tutorial", "Simulator", "Resources")
     st.space("medium")
     st.title("Quiz", text_alignment="center")
     st.markdown("Test your knowledge with real world scenarios!", text_alignment="center")
@@ -45,37 +30,46 @@ def display_quiz():
     if "quiz_answered" not in st.session_state:
         st.session_state.quiz_answered = False
 
-    def display_quiz_scenario(scenario):
-        if st.session_state.quiz_position >= 5:
-            card_container = st.container(border=True)
-            with card_container:
-                if st.session_state.bank > 10000:
-                    st.header("Congratulations!", text_alignment="center")
-                    st.space("small")
-                    st.subheader(f"Final Balance: {format_currency(st.session_state.bank)}", text_alignment="center")
-                    st.markdown(f"Your options pricing knowledge made you: {format_currency(st.session_state.bank - 10000)}", text_alignment="center")
-                again_col, resources_col = st.columns(2)
-                with again_col:
-                    with st.container(horizontal_alignment="center"):
-                        if st.button("Play Again!", use_container_width=True):
-                                st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
-                                st.session_state.quiz_position = 0
-                                st.session_state.bank = 10000
-                                st.session_state.quiz_answered = False
-                                st.rerun()
-                with resources_col:
-                    with st.container(horizontal_alignment="center"):
-                        if st.button("Go to Resources!", use_container_width=True):
-                            st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
-                            st.session_state.quiz_position = 0
-                            st.session_state.bank = 10000
-                            st.session_state.quiz_answered = False
-                            st.session_state.page = "Resources"
-                            st.rerun()
-                if st.session_state.bank <= 10000:
-                    st.header("Great Effort!", text_alignment="center")
-                    st.space("small")
-                    st.subheader(f"Final Balance: {format_currency(st.session_state.bank)}", text_alignment="center")
+    # if st.session_state.quiz_position >= 5:
+    #     display_final_screen()
+
+    # else:
+    #     scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
+    #     current_scenario = quiz.df.loc[scenario_index]
+    #     display_quiz_scenario(scenario)
+
+    # def display_quiz_scenario(scenario):
+        
+    # def display_final_screen():
+    #     card_container = st.container(border=True)
+    #     with card_container:
+    #             if st.session_state.bank > 10000:
+    #                 st.header("Congratulations!", text_alignment="center")
+    #                 st.space("small")
+    #                 st.subheader(f"Final Balance: {format_currency(st.session_state.bank)}", text_alignment="center")
+    #                 st.markdown(f"Your options pricing knowledge made you: {format_currency(st.session_state.bank - 10000)}", text_alignment="center")
+    #             again_col, resources_col = st.columns(2)
+    #             with again_col:
+    #                 with st.container(horizontal_alignment="center"):
+    #                     if st.button("Play Again!", use_container_width=True):
+    #                             st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
+    #                             st.session_state.quiz_position = 0
+    #                             st.session_state.bank = 10000
+    #                             st.session_state.quiz_answered = False
+    #                             st.rerun()
+    #             with resources_col:
+    #                 with st.container(horizontal_alignment="center"):
+    #                     if st.button("Go to Resources!", use_container_width=True):
+    #                         st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
+    #                         st.session_state.quiz_position = 0
+    #                         st.session_state.bank = 10000
+    #                         st.session_state.quiz_answered = False
+    #                         st.session_state.page = "Resources"
+    #                         st.rerun()
+    #             if st.session_state.bank <= 10000:
+    #                 st.header("Great Effort!", text_alignment="center")
+    #                 st.space("small")
+    #                 st.subheader(f"Final Balance: {format_currency(st.session_state.bank)}", text_alignment="center")
 
                         
 

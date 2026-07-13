@@ -1,4 +1,5 @@
 import streamlit as st
+from ui_components.navbar import display_nav_bar
 
 from ui_pages.tutorial import display_tutorial
 from ui_pages.simulator import display_simulator
@@ -10,6 +11,8 @@ st.set_page_config(layout="wide")
 if "page" not in st.session_state:
     st.session_state.page = "Home"
 
+
+
 def display_main():
     st.title("Welcome to Option-Pricing-Simulator", text_alignment="center")
     col1, col2 = st.columns(2)
@@ -18,7 +21,6 @@ def display_main():
     col2.markdown("https://github.com/rianganesh64-sketch", text_alignment="center")
 
     st.space("medium")
-
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         if st.button("Tutorial"):
