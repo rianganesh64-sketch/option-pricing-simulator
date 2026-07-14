@@ -29,6 +29,7 @@ def display_simulator():
         st.session_state.gbm_paths = None
 
     display_nav_bar("Home", "Tutorial", "Quiz", "Resources")
+    st.space("small")
     st.title("Welcome to the Simulator!", text_alignment="center")
     st.markdown("### Experiment with different option inputs and compare how Black-Scholes and Monte Carlo prices change.", text_alignment="center")
     st.space("small")
@@ -58,7 +59,7 @@ def display_simulator():
             st.write("Entered Number of Simulations:", num_simulations)
             st.caption("Lower simulation counts usually create noisier, less stable estimates. More simulations can improve accuracy, but they also take longer to run. Try changing this value and see what happens!", text_alignment="center")
             st.space("xxsmall")
-            num_paths = st.slider("How many GBM Paths to Generate?", 1, 5, value=10)
+            num_paths = st.slider("How many GBM Paths to Generate?", 1, 10, value=5)
             st.write("Number of Displayed GBM Paths:", num_paths)
             st.space("xxsmall")
             selected_option = st.radio(
