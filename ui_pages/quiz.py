@@ -8,7 +8,7 @@ from src.black_scholes import black_scholes_price
 from src.monte_carlo import monte_carlo_price
 
 
-CSV_PATH = Path("data/real_world_option_quiz_scenarios_take_skip.csv")
+CSV_PATH = Path("data/real_world_option_quiz_scenarios_true_history.csv")
 @st.cache_data
 def load_quiz_data():
     return pd.read_csv(CSV_PATH)
@@ -31,10 +31,12 @@ def display_quiz():
         st.session_state.bs_price = None
     if "mc_price" not in st.session_state:
         st.session_state.mc_price = None
-    if "confirm_option" not in st.session_state:
-        st.session_state.confirm_option = None
-    if "skip" not in st.session_state:
-        st.session_state.skip = None
+    if "quiz_submitted" not in st.session_state:
+        st.session_state.quiz_submitted = False
+    if "last_action" not in st.session_state:
+        st.session_state.last_action = None # Tracks take or skip
+    if "chosen_contracts" not in st.session_state:
+        st.session_state.chosen_contracts = 0
 
     def display_quiz_scenario(scenario):
         quiz_container = st.container(border=True)
@@ -72,8 +74,14 @@ def display_quiz():
                     num_simulations = st.slider("Number of Monte-carlo Simulations", 100, 10000, step=100)
                 call_put_container = st.container(horizontal_alignment="center")
                 with call_put_container:
-                    selected_option = st.radio("Call or Put Option:",
+                    if scenario["option_type"] == "Call":
+                        chosen_index = 0
+                    else:
+                        chosen_index =  1
+                    selected_option = st.radio(
+                        "Call or Put Option:",
                              ["Call", "Put"],
+                             index = chosen_index,
                     horizontal=True)
                 bs_col, mc_col = st.columns(2)
                 with bs_col:
@@ -117,9 +125,7 @@ def display_quiz():
                     st.space("large")
                 with right_col:
                     st.markdown("### Your Decision:", text_alignment="center")
-                    st.space("xxsmall")
                     st.markdown(f"##### {scenario["setup"]}", text_alignment="center")
-                    st.markdown(f"###### Your bank is at {format_currency(st.session_state.bank_value)}. Run the mini-simulator, compare its estimate with the market option price, then decide whether to take this option or skip it. If you take it, choose how much of your bank to invest. Each option contract controls 100 shares of the stock.", text_alignment="center")
                     st.markdown(f"#### **Option Price: {scenario["market_option_price"]}**", text_alignment="center")
                     take_col, skip_col = st.columns(2, border=True)
                     with take_col:
@@ -127,19 +133,49 @@ def display_quiz():
                         amount_contracts = st.slider("How Many Contracts: ", 1, (math.floor(st.session_state.bank_value / (100 * scenario["market_option_price"]))))
                         st.write("Number of Options Contracts Chosen: ", amount_contracts)
                         st.write(f"Estimated Cost: {format_currency(100 * scenario["market_option_price"] * amount_contracts)}")
-                        st.write(f"Remaining Bank Balance: {format_currency(st.session_state.bank_value - (100 * scenario["market_option_price"] * amount_contracts))}")
-                        st.space("xxsmall")
-                        confirm_container = st.container(horizontal_alignment="center")
-                        with confirm_container:
-                            st.session_state.confirm_option = st.button("Confirm Trade?", use_container_width=True)
+                        st.write(f"Remaining Bank Balance: {format_currency(st.session_state.bank_value - (100 * scenario["market_option_price"] * amount_contracts))}")  
                     with skip_col:
                         st.subheader("Skip Trade", text_alignment="center")
                         st.markdown("Doesn't seem right? You don't have to trade!", text_alignment="center")
-                        st.space("xxlarge")
-                        st.space("small")
+                    btn_1, btn_2 = st.columns(2)
+                    with btn_1:
+                        confirm_container = st.container(horizontal_alignment="center")
+                        with confirm_container:
+                            if st.button("Confirm Trade?", use_container_width=True, type="primary"):
+                                st.session_state.last_action = "take"
+                                st.session_state.chosen_contracts = amount_contracts
+                                st.session_state.quiz_submitted = True
+                                st.rerun()
+                    with btn_2:
                         skip_container = st.container(horizontal_alignment="center")
                         with skip_container:
-                            st.session_state.skip = st.button("Skip Trade?", use_container_width=True)
+                            if st.button("Skip Trade?", use_container_width=True,  type="secondary"):
+                                st.session_state.last_action = "skip"
+                                st.session_state.chosen_contracts = 0
+                                st.session_state.quiz_submitted = True
+                                st.rerun()
+            st.caption(f"#### Your bank is at **{format_currency(st.session_state.bank_value)}**. Run the mini-simulator, compare its estimate with the market option price, then decide whether to take this option or skip it. If you take it, choose how much of your bank to invest. Each option contract controls 100 shares of the stock.", text_alignment="center")
+    def display_summary_scene(scenario):
+        summary_container = st.container(border=True)
+        with summary_container:
+            if st.session_state.last_action == "skip":
+                st.title("You Skipped:", text_alignment="center")
+                # Temporary debug line to see what columns actually exist
+                st.write("Available columns:", list(scenario.keys()))
+            else:
+                st.title("You Traded:", text_alignment = "center")
+                st.subheader(f"Bought: {st.session_state.chosen_contracts} contracts", text_alignment="center")
+                st.markdown(f"#### What Happened in Real Life?", text_alignment="center")
+                st.markdown(f"#### {scenario["post_event_outcome"]}", text_alignment="center")
+                st.space("small")
+                # Temporary debug line to see what columns actually exist
+                st.write("Available columns:", list(scenario.keys()))
+                # if scenario["expiration_status"] == "Out-of-the-Money":
+                #     st.header(":red[Unprofitable]")
+                # elif scenario["expiration_status"] == "In-the-Money":
+                #     st.header(":green[Profitable!]")
+
+
 
 
 
@@ -157,11 +193,14 @@ def display_quiz():
     if st.session_state.quiz_position >= 5:
         st.write("You finished")
         #display_final_screen()
-    
     else:
         scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
         current_scenario = quiz_df.loc[scenario_index]
-        display_quiz_scenario(current_scenario)
+
+        if st.session_state.quiz_submitted:
+            display_summary_scene(current_scenario)
+        else:
+            display_quiz_scenario(current_scenario)
     
 
     # st.write(f"Loaded {len(quiz_df)} scenarios.")
