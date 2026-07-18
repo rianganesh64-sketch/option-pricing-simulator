@@ -37,16 +37,8 @@ def display_quiz():
         st.session_state.last_action = None # Tracks take or skip
     if "chosen_contracts" not in st.session_state:
         st.session_state.chosen_contracts = 0
-    if "quiz_history_1" not in st.session_state: #possibly later make this a list of dictionaries rather than 5 individual dictionaries
-        st.session_state.quiz_history_1 = {}
-    if "quiz_history_2" not in st.session_state:
-        st.session_state.quiz_history_2 = {}
-    if "quiz_history_3" not in st.session_state:
-        st.session_state.quiz_history_3 = {}
-    if "quiz_history_4" not in st.session_state:
-        st.session_state.quiz_history_4 = {}
-    if "quiz_history_5" not in st.session_state:
-        st.session_state.quiz_history_5 = {}
+    if "quiz_history" not in st.session_state:
+        st.session_state.quiz_history = [{} for _ in range(5)]
 
     def display_quiz_scenario(scenario):
         quiz_container = st.container(border=True)
@@ -140,10 +132,23 @@ def display_quiz():
                     take_col, skip_col = st.columns(2, border=True)
                     with take_col:
                         st.subheader("Take Option", text_alignment="center")
-                        amount_contracts = st.slider("How Many Contracts: ", 1, (math.floor(st.session_state.bank_value / (100 * scenario["market_option_price"]))))
-                        st.write("Number of Options Contracts Chosen: ", amount_contracts)
-                        st.write(f"Estimated Cost: {format_currency(100 * scenario["market_option_price"] * amount_contracts)}")
-                        st.write(f"Remaining Bank Balance: {format_currency(st.session_state.bank_value - (100 * scenario["market_option_price"] * amount_contracts))}")  
+                        max_contracts = math.floor(st.session_state.bank_value / (100 * scenario["market_option_price"]))
+                        if max_contracts >= 2:
+                            amount_contracts = st.slider("How Many Contracts: ", 1, (math.floor(st.session_state.bank_value / (100 * scenario["market_option_price"]))))
+                            st.write("Number of Options Contracts Chosen: ", amount_contracts)
+                            st.session_state.chosen_contracts = amount_contracts #figure this out, possibly unbound error
+                            st.write(f"Estimated Cost: {format_currency(100 * scenario["market_option_price"] * amount_contracts)}")
+                            st.write(f"Remaining Bank Balance: {format_currency(st.session_state.bank_value - (100 * scenario["market_option_price"] * amount_contracts))}") 
+                        if max_contracts == 1:
+                            st.warning("Your bank balance only permits the purchase of exactly **1 contract** for this trade") #find a way for center alignmnet, possibly custom html injection
+                            amount_contracts = 1
+                            st.write(f"Estimated Cost: {format_currency(100 * scenario["market_option_price"] * amount_contracts)}")
+                            st.write(f"Remaining Bank Balance: {format_currency(st.session_state.bank_value - (100 * scenario["market_option_price"] * amount_contracts))}")
+                        elif max_contracts < 1:
+                            st.error("**Insufficient Funds:** Your bank doesn't permit you to purchase any option contracts")
+                            amount_contracts = 0
+                            st.write(f"Estimated Cost: {format_currency(100 * scenario["market_option_price"] * amount_contracts)}")
+                            st.write(f"Remaining Bank Balance: {format_currency(st.session_state.bank_value - (100 * scenario["market_option_price"] * amount_contracts))}")
                     with skip_col:
                         st.subheader("Skip Trade", text_alignment="center")
                         st.markdown("Doesn't seem right? You don't have to trade!", text_alignment="center")
@@ -166,7 +171,21 @@ def display_quiz():
                                         final_option_worth = max(final_stock_price - strike, 0.0) * st.session_state.chosen_contracts * 100
                                     else:
                                         final_option_worth = max(strike - final_stock_price, 0.0) * st.session_state.chosen_contracts * 100
-                                st.session_state.bank_value = st.session_state.bank_value - premium_cost + final_option_worth
+                                
+                                net_profit = final_option_worth - premium_cost
+                                st.session_state.bank_value = st.session_state.bank_value + net_profit
+
+                                idx = st.session_state.quiz_position
+                                st.session_state.quiz_history[idx] = {
+                                    "ticker": scenario["ticker"],
+                                    "option_type": scenario["option_type"],
+                                    "action": "Trade",
+                                    "num_contracts": amount_contracts,
+                                    "itm_otm": scenario["expiration_status"],
+                                    "profit_loss": net_profit,
+                                    "ending_bank": st.session_state.bank_value,
+                                    "lesson": scenario["lesson"]
+                                }
                                 st.rerun()
                     with btn_2:
                         skip_container = st.container(horizontal_alignment="center")
@@ -176,6 +195,14 @@ def display_quiz():
                                 st.session_state.chosen_contracts = 0
                                 st.session_state.quiz_submitted = True
                                 st.session_state.bank_value = st.session_state.bank_value
+
+                                idx = st.session_state.quiz_position
+                                st.session_state.quiz_history[idx] = {
+                                    "ticker": scenario["ticker"],
+                                    "option_type": scenario["option_type"],
+                                    "action": "Trade",
+                                    "itm_otm"   
+                                }
                                 st.rerun()
             st.caption(f"#### Your bank is at **{format_currency(st.session_state.bank_value)}**. Run the mini-simulator, compare its estimate with the market option price, then decide whether to take this option or skip it. If you take it, choose how much of your bank to invest. Each option contract controls 100 shares of the stock.", text_alignment="center")
             if st.session_state.quiz_position == 0:
@@ -183,7 +210,8 @@ def display_quiz():
                 action_index_1 = 0
                 summaries_list_1 = list(st.session_state.quiz_history_1.items())
                 summaries_list_1.insert(action_index_1, action_update_1)
-                
+                st.session_state.quiz_history_1 = dict(summaries_list_1)
+
             if st.session_state.quiz_position == 1:
                 st.write("1")
             if st.session_state.quiz_position == 2:
@@ -255,26 +283,10 @@ def display_quiz():
                 #Make sure to add reset button once screen switching is good
                 
 
-                
-                
-
-
-
-
-
-
-
-
-                
-
-
-
-
-
-
         
     if st.session_state.quiz_position >= 5:
-        st.write("You finished")
+        st.title("You finished")
+        st.write(st.session_state.quiz_history_1["quiz_1_action"])
         #display_final_screen()
     else:
         scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
