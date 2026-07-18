@@ -8,7 +8,7 @@ from src.black_scholes import black_scholes_price
 from src.monte_carlo import monte_carlo_price
 
 
-CSV_PATH = Path("data/real_world_option_quiz_scenarios_true_history.csv")
+CSV_PATH = Path("data/rebalanced_options_quiz_scenarios.csv")
 @st.cache_data
 def load_quiz_data():
     return pd.read_csv(CSV_PATH)
@@ -37,6 +37,16 @@ def display_quiz():
         st.session_state.last_action = None # Tracks take or skip
     if "chosen_contracts" not in st.session_state:
         st.session_state.chosen_contracts = 0
+    if "quiz_history_1" not in st.session_state: #possibly later make this a list of dictionaries rather than 5 individual dictionaries
+        st.session_state.quiz_history_1 = {}
+    if "quiz_history_2" not in st.session_state:
+        st.session_state.quiz_history_2 = {}
+    if "quiz_history_3" not in st.session_state:
+        st.session_state.quiz_history_3 = {}
+    if "quiz_history_4" not in st.session_state:
+        st.session_state.quiz_history_4 = {}
+    if "quiz_history_5" not in st.session_state:
+        st.session_state.quiz_history_5 = {}
 
     def display_quiz_scenario(scenario):
         quiz_container = st.container(border=True)
@@ -111,18 +121,18 @@ def display_quiz():
                 with left_col:
                     st.markdown("### Option Specifications:", text_alignment="center")
                     st.space("small")
-                    st.markdown(f"Stock Price: {format_currency(scenario["stock_price"])}", text_alignment="center")
+                    st.markdown(f"#### Stock Price: {format_currency(scenario["stock_price"])}", text_alignment="center")
                     st.space("xxsmall")
-                    st.markdown(f"Strike Price: {format_currency(scenario["strike_price"])}", text_alignment="center")
+                    st.markdown(f"#### Strike Price: {format_currency(scenario["strike_price"])}", text_alignment="center")
                     st.space("xxsmall")
-                    st.markdown(f"Time Till Expiry (Months): {scenario["time_to_expiration_months"]}", text_alignment="center")
+                    st.markdown(f"#### Time Till Expiry (Months): {scenario["time_to_expiration_months"]}", text_alignment="center")
                     st.space("xxsmall")
-                    st.markdown(f"Volatility: {format_percent(scenario["volatility_percent"])}", text_alignment="center")
+                    st.markdown(f"#### Volatility: {format_percent(scenario["volatility_percent"])}", text_alignment="center")
                     st.space("xxsmall")
-                    st.markdown(f"Risk Free Rate: {format_percent(scenario["risk_free_rate_percent"])}", text_alignment="center")
+                    st.markdown(f"#### Risk Free Rate: {format_percent(scenario["risk_free_rate_percent"])}", text_alignment="center")
                     st.space("xxsmall")
-                    st.markdown(f"Option Type: {scenario["option_type"]}", text_alignment="center")
-                    st.space("large")
+                    st.markdown(f"#### Option Type: {scenario["option_type"]}", text_alignment="center")
+                    st.space("medium")
                 with right_col:
                     st.markdown("### Your Decision:", text_alignment="center")
                     st.markdown(f"##### {scenario["setup"]}", text_alignment="center")
@@ -145,6 +155,18 @@ def display_quiz():
                                 st.session_state.last_action = "take"
                                 st.session_state.chosen_contracts = amount_contracts
                                 st.session_state.quiz_submitted = True
+
+                                premium_cost = scenario["market_option_price"] * st.session_state.chosen_contracts * 100
+                                strike = scenario["strike_price"]
+                                final_stock_price = scenario["stock_price_at_expiration"]
+                                if scenario["expiration_status"] == "Out-of-the-Money":
+                                    final_option_worth = 0.0
+                                else:
+                                    if scenario["option_type"] == "Call":
+                                        final_option_worth = max(final_stock_price - strike, 0.0) * st.session_state.chosen_contracts * 100
+                                    else:
+                                        final_option_worth = max(strike - final_stock_price, 0.0) * st.session_state.chosen_contracts * 100
+                                st.session_state.bank_value = st.session_state.bank_value - premium_cost + final_option_worth
                                 st.rerun()
                     with btn_2:
                         skip_container = st.container(horizontal_alignment="center")
@@ -153,8 +175,22 @@ def display_quiz():
                                 st.session_state.last_action = "skip"
                                 st.session_state.chosen_contracts = 0
                                 st.session_state.quiz_submitted = True
+                                st.session_state.bank_value = st.session_state.bank_value
                                 st.rerun()
             st.caption(f"#### Your bank is at **{format_currency(st.session_state.bank_value)}**. Run the mini-simulator, compare its estimate with the market option price, then decide whether to take this option or skip it. If you take it, choose how much of your bank to invest. Each option contract controls 100 shares of the stock.", text_alignment="center")
+            if st.session_state.quiz_position == 0:
+                action_update_1 = ("quiz_1_action", st.session_state.last_action)
+                action_index_1 = 0
+                summaries_list_1 = list(st.session_state.quiz_history_1.items())
+                summaries_list_1.insert(action_index_1, action_update_1)
+                
+            if st.session_state.quiz_position == 1:
+                st.write("1")
+            if st.session_state.quiz_position == 2:
+                st.write("2")
+            if st.session_state.quiz_position == 3:
+                st.write("3")
+    
     def display_summary_scene(scenario):
         summary_container = st.container(border=True)
         with summary_container:
@@ -162,7 +198,7 @@ def display_quiz():
                 if scenario["expiration_status"] == "Out-of-the-Money":
                     st.title("You Skipped: Great Job!", text_alignment="center")
                 else:
-                    st.title("You Skipped: Are you sure?")
+                    st.title("You Skipped: Are you sure?", text_alignment="center")
                 st.markdown(f"#### What Happened in Real Life?", text_alignment="center")
                 st.markdown(f"#### {scenario["post_event_outcome"]}", text_alignment="center")
                 if scenario["expiration_status"] == "Out-of-the-Money":
@@ -172,6 +208,17 @@ def display_quiz():
                 st.header("Lesson From this Trade:", text_alignment="center")
                 st.subheader(f"{scenario["lesson"]}", text_alignment="center")
                 st.subheader(f"Current Bank Balance: {format_currency(st.session_state.bank_value)}", text_alignment="center")
+                button_container = st.container(horizontal_alignment="center")
+                with button_container:
+                    if st.button("Next Question!", type="primary"):
+                        st.session_state.quiz_position += 1
+                        st.session_state.bs_price = None
+                        st.session_state.mc_price = None
+                        st.session_state.quiz_submitted = False
+                        st.session_state.last_action = None
+                        st.session_state.chosen_contracts = 0
+                        st.rerun()
+                #Make sure to add reset button once screen switching is good
             else:
                 st.title(f"You Traded {st.session_state.chosen_contracts} contracts of {scenario["ticker"]} {scenario["option_type"]} Options", text_alignment = "center")
                 st.markdown(f"#### What Happened in Real Life?", text_alignment="center")
@@ -183,12 +230,29 @@ def display_quiz():
                 st.header("Lesson From this Trade:", text_alignment="center")
                 st.subheader(f"{scenario["lesson"]}", text_alignment="center")
                 st.space("medium")
-                if scenario["expiration_status"] == "Out-of-the-Money":
-                    option_worth = 0
-                else:
-                    option_worth = abs(scenario["stock_price"] - scenario["stock_price_at_expiration"])
-                st.session_state.bank_value = st.session_state.bank_value + ((option_worth + scenario["market_option_price"]) * st.session_state.chosen_contracts * 100)
+                # premium_cost = scenario["market_option_price"] * st.session_state.chosen_contracts * 100
+                # strike = scenario["strike_price"]
+                # final_stock_price = scenario["stock_price_at_expiration"]
+                # if scenario["expiration_status"] == "Out-of-the-Money":
+                #     final_option_worth = 0.0
+                # else:
+                #     if scenario["option_type"] == "Call":
+                #         final_option_worth = max(final_stock_price - strike, 0.0) * st.session_state.chosen_contracts * 100
+                #     else:
+                #         final_option_worth = max(strike - final_stock_price, 0.0) * st.session_state.chosen_contracts * 100
+                # st.session_state.bank_value = st.session_state.bank_value - premium_cost + final_option_worth
                 st.subheader(f"Current Bank Balance: {format_currency(st.session_state.bank_value)}", text_alignment="center")
+                button_container = st.container(horizontal_alignment="center")
+                with button_container:
+                    if st.button("Next Question!", type="primary"):
+                        st.session_state.quiz_position += 1
+                        st.session_state.bs_price = None
+                        st.session_state.mc_price = None
+                        st.session_state.quiz_submitted = False
+                        st.session_state.last_action = None
+                        st.session_state.chosen_contracts = 0
+                        st.rerun()
+                #Make sure to add reset button once screen switching is good
                 
 
                 
