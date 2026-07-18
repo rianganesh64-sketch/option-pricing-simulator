@@ -159,21 +159,40 @@ def display_quiz():
         summary_container = st.container(border=True)
         with summary_container:
             if st.session_state.last_action == "skip":
-                st.title("You Skipped:", text_alignment="center")
-                # Temporary debug line to see what columns actually exist
-                st.write("Available columns:", list(scenario.keys()))
-            else:
-                st.title("You Traded:", text_alignment = "center")
-                st.subheader(f"Bought: {st.session_state.chosen_contracts} contracts", text_alignment="center")
+                if scenario["expiration_status"] == "Out-of-the-Money":
+                    st.title("You Skipped: Great Job!", text_alignment="center")
+                else:
+                    st.title("You Skipped: Are you sure?")
                 st.markdown(f"#### What Happened in Real Life?", text_alignment="center")
                 st.markdown(f"#### {scenario["post_event_outcome"]}", text_alignment="center")
-                st.space("small")
-                # Temporary debug line to see what columns actually exist
-                st.write("Available columns:", list(scenario.keys()))
-                # if scenario["expiration_status"] == "Out-of-the-Money":
-                #     st.header(":red[Unprofitable]")
-                # elif scenario["expiration_status"] == "In-the-Money":
-                #     st.header(":green[Profitable!]")
+                if scenario["expiration_status"] == "Out-of-the-Money":
+                     st.title(":red[Unprofitable]", text_alignment="center")
+                elif scenario["expiration_status"] == "In-the-Money":
+                     st.title(":green[Profitable!]", text_alignment="center")
+                st.header("Lesson From this Trade:", text_alignment="center")
+                st.subheader(f"{scenario["lesson"]}", text_alignment="center")
+                st.subheader(f"Current Bank Balance: {format_currency(st.session_state.bank_value)}", text_alignment="center")
+            else:
+                st.title(f"You Traded {st.session_state.chosen_contracts} contracts of {scenario["ticker"]} {scenario["option_type"]} Options", text_alignment = "center")
+                st.markdown(f"#### What Happened in Real Life?", text_alignment="center")
+                st.markdown(f"#### {scenario["post_event_outcome"]}", text_alignment="center")
+                if scenario["expiration_status"] == "Out-of-the-Money":
+                     st.title(":red[Unprofitable]", text_alignment="center")
+                elif scenario["expiration_status"] == "In-the-Money":
+                     st.title(":green[Profitable!]", text_alignment="center")
+                st.header("Lesson From this Trade:", text_alignment="center")
+                st.subheader(f"{scenario["lesson"]}", text_alignment="center")
+                st.space("medium")
+                if scenario["expiration_status"] == "Out-of-the-Money":
+                    option_worth = 0
+                else:
+                    option_worth = abs(scenario["stock_price"] - scenario["stock_price_at_expiration"])
+                st.session_state.bank_value = st.session_state.bank_value + ((option_worth + scenario["market_option_price"]) * st.session_state.chosen_contracts * 100)
+                st.subheader(f"Current Bank Balance: {format_currency(st.session_state.bank_value)}", text_alignment="center")
+                
+
+                
+                
 
 
 
