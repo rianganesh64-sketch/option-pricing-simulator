@@ -15,9 +15,9 @@ def load_quiz_data():
 
 def display_quiz():
     display_nav_bar("Home", "Tutorial", "Simulator", "Resources")
-    st.space("small")
-    st.title("Quiz", text_alignment="center")
-    st.markdown("### Test your knowledge with real world scenarios!", text_alignment="center")
+    # st.space("small")
+    # st.title("Quiz", text_alignment="center")
+    # st.markdown("### Test your knowledge with real world scenarios!", text_alignment="center")
 
     quiz_df = load_quiz_data()
 
@@ -41,6 +41,9 @@ def display_quiz():
         st.session_state.quiz_history = [{} for _ in range(5)]
 
     def display_quiz_scenario(scenario):
+        st.space("small")
+        st.title("Quiz", text_alignment="center")
+        st.markdown("### Test your knowledge with real world scenarios!", text_alignment="center")
         quiz_container = st.container(border=True)
         with quiz_container:
             header_container = st.container(border=True)
@@ -177,10 +180,22 @@ def display_quiz():
 
                                 idx = st.session_state.quiz_position
                                 st.session_state.quiz_history[idx] = {
+                                    "title": scenario["title"],
+                                    "date": scenario["event_date"],
+                                    "description": scenario['pre_decision_context'],
+                                    "stock_price": scenario["stock_price"],
+                                    "strike_price": scenario["strike_price"],
+                                    "time_till_expiry": scenario["time_to_expiration_months"],
+                                    "volatility": scenario["volatility_percent"],
+                                    "risk_free_rate": scenario["risk_free_rate_percent"],
+                                    "category": scenario["category"],
+                                    "difficulty": scenario["difficulty"],
+                                    "option_price": scenario["market_option_price"],
                                     "ticker": scenario["ticker"],
                                     "option_type": scenario["option_type"],
                                     "action": "Trade",
                                     "num_contracts": amount_contracts,
+                                    "result": scenario["post_event_outcome"],
                                     "itm_otm": scenario["expiration_status"],
                                     "profit_loss": net_profit,
                                     "ending_bank": st.session_state.bank_value,
@@ -198,28 +213,34 @@ def display_quiz():
 
                                 idx = st.session_state.quiz_position
                                 st.session_state.quiz_history[idx] = {
+                                    "title": scenario["title"],
+                                    "date": scenario["event_date"],
+                                    "description": scenario['pre_decision_context'],
+                                    "stock_price": scenario["stock_price"],
+                                    "strike_price": scenario["strike_price"],
+                                    "time_till_expiry": scenario["time_to_expiration_months"],
+                                    "volatility": scenario["volatility_percent"],
+                                    "risk_free_rate": scenario["risk_free_rate_percent"],
+                                    "category": scenario["category"],
+                                    "difficulty": scenario["difficulty"],
+                                    "option_price": scenario["market_option_price"],
                                     "ticker": scenario["ticker"],
                                     "option_type": scenario["option_type"],
-                                    "action": "Trade",
-                                    "itm_otm"   
+                                    "action": "Skip",
+                                    "num_contracts": 0,
+                                    "result": scenario["post_event_outcome"],
+                                    "itm_otm": scenario["option_type"],
+                                    "profit_loss": 0,
+                                    "ending_bank": st.session_state.bank_value,
+                                    "lesson": scenario["lesson"]
                                 }
                                 st.rerun()
             st.caption(f"#### Your bank is at **{format_currency(st.session_state.bank_value)}**. Run the mini-simulator, compare its estimate with the market option price, then decide whether to take this option or skip it. If you take it, choose how much of your bank to invest. Each option contract controls 100 shares of the stock.", text_alignment="center")
-            if st.session_state.quiz_position == 0:
-                action_update_1 = ("quiz_1_action", st.session_state.last_action)
-                action_index_1 = 0
-                summaries_list_1 = list(st.session_state.quiz_history_1.items())
-                summaries_list_1.insert(action_index_1, action_update_1)
-                st.session_state.quiz_history_1 = dict(summaries_list_1)
 
-            if st.session_state.quiz_position == 1:
-                st.write("1")
-            if st.session_state.quiz_position == 2:
-                st.write("2")
-            if st.session_state.quiz_position == 3:
-                st.write("3")
-    
     def display_summary_scene(scenario):
+        st.space("small")
+        st.title("Quiz", text_alignment="center")
+        st.markdown("### Test your knowledge with real world scenarios!", text_alignment="center")
         summary_container = st.container(border=True)
         with summary_container:
             if st.session_state.last_action == "skip":
@@ -238,15 +259,24 @@ def display_quiz():
                 st.subheader(f"Current Bank Balance: {format_currency(st.session_state.bank_value)}", text_alignment="center")
                 button_container = st.container(horizontal_alignment="center")
                 with button_container:
-                    if st.button("Next Question!", type="primary"):
-                        st.session_state.quiz_position += 1
-                        st.session_state.bs_price = None
-                        st.session_state.mc_price = None
-                        st.session_state.quiz_submitted = False
-                        st.session_state.last_action = None
-                        st.session_state.chosen_contracts = 0
-                        st.rerun()
-                #Make sure to add reset button once screen switching is good
+                    if st.session_state.quiz_position >= 4:
+                        if st.button("Finish!", type="primary"):
+                            st.session_state.quiz_position += 1
+                            st.session_state.bs_price = None
+                            st.session_state.mc_price = None
+                            st.session_state.quiz_submitted = False
+                            st.session_state.last_action = None
+                            st.session_state.chosen_contracts = 0
+                            st.rerun()
+                    else:
+                        if st.button("Next Question!", type="primary"):
+                            st.session_state.quiz_position += 1
+                            st.session_state.bs_price = None
+                            st.session_state.mc_price = None
+                            st.session_state.quiz_submitted = False
+                            st.session_state.last_action = None
+                            st.session_state.chosen_contracts = 0
+                            st.rerun()
             else:
                 st.title(f"You Traded {st.session_state.chosen_contracts} contracts of {scenario["ticker"]} {scenario["option_type"]} Options", text_alignment = "center")
                 st.markdown(f"#### What Happened in Real Life?", text_alignment="center")
@@ -272,120 +302,180 @@ def display_quiz():
                 st.subheader(f"Current Bank Balance: {format_currency(st.session_state.bank_value)}", text_alignment="center")
                 button_container = st.container(horizontal_alignment="center")
                 with button_container:
-                    if st.button("Next Question!", type="primary"):
-                        st.session_state.quiz_position += 1
-                        st.session_state.bs_price = None
-                        st.session_state.mc_price = None
-                        st.session_state.quiz_submitted = False
-                        st.session_state.last_action = None
-                        st.session_state.chosen_contracts = 0
-                        st.rerun()
-                #Make sure to add reset button once screen switching is good
+                    if st.session_state.quiz_position >= 4:
+                        if st.button("Finish!", type="primary"):
+                            st.session_state.quiz_position += 1
+                            st.session_state.bs_price = None
+                            st.session_state.mc_price = None
+                            st.session_state.quiz_submitted = False
+                            st.session_state.last_action = None
+                            st.session_state.chosen_contracts = 0
+                            st.rerun()
+                    else:
+                        if st.button("Next Question!", type="primary"):
+                            st.session_state.quiz_position += 1
+                            st.session_state.bs_price = None
+                            st.session_state.mc_price = None
+                            st.session_state.quiz_submitted = False
+                            st.session_state.last_action = None
+                            st.session_state.chosen_contracts = 0
+                            st.rerun()
                 
 
         
     if st.session_state.quiz_position >= 5:
-        st.title("You finished")
-        st.write(st.session_state.quiz_history_1["quiz_1_action"])
-        #display_final_screen()
+        st.space("small")
+        if st.session_state.bank_value > 10000:
+            st.title("Quiz Complete: Congratulations!", text_alignment="center")
+            total_profit = st.session_state.bank_value - 10000
+            st.header(f"Total Profit: :green[{format_currency(total_profit)}]", text_alignment="center")
+            st.header(f"Final Bank Balance: :green[{format_currency(st.session_state.bank_value)}]", text_alignment="center")
+            st.subheader("Let's analyze your trades:", text_alignment="center")
+            st.space("small")
+        elif st.session_state.bank_value < 10000:
+            st.title("Quiz Complete: You Learnt a Lot!", text_alignment="center")
+            total_profit = 10000 -  st.session_state.bank_value 
+            st.header(f"Total Loss: :red[-{format_currency(total_profit)}]", text_alignment="center")
+            st.header(f"Final Bank Balance: :red[{format_currency(st.session_state.bank_value)}]", text_alignment="center")
+            st.subheader("Let's analyze your trades:", text_alignment="center")
+            st.space("small")
+        else:
+            st.title("Quiz Complete: You Learnt a Lot!", text_alignment="center")
+            total_profit = 10000 -  st.session_state.bank_value 
+            st.header(f"Total Profit: :grey[{format_currency(total_profit)}]", text_alignment="center")
+            st.header(f"Final Bank Balance: :grey[{format_currency(st.session_state.bank_value)}]", text_alignment="center")
+            st.subheader("Let's analyze your trades:", text_alignment="center")
+            st.space("small")
+
+        for i in range(5):
+            trade = st.session_state.quiz_history[i]
+
+            if not trade:
+                continue
+                
+            if trade["profit_loss"] > 0:
+                with st.expander(f"Scenario {i+1}: {trade['ticker']} {trade["option_type"]} Option {trade['action']}: :green[+{format_currency(trade["profit_loss"])}]",):
+                    st.subheader(f"{trade["title"]} ({trade["date"]})", text_alignment="center")
+                    st.markdown(f" ##### {trade["description"]}", text_alignment="center")
+                    spec_col, result_col = st.columns([1, 2.5], border=True)
+                    with spec_col:
+                            st.markdown(f" ##### Option Specifications:", text_alignment="center")
+                            st.markdown(f"###### Stock Price: {format_currency(trade["stock_price"])}", text_alignment="center")
+                            st.markdown(f"###### Strike Price: {format_currency(trade["strike_price"])}", text_alignment="center")
+                            st.markdown(f"###### Time Till Expiry (Months): {trade["time_till_expiry"]}", text_alignment="center")
+                            st.markdown(f"###### Volatility: {format_percent(trade["volatility"])}", text_alignment="center")
+                            st.markdown(f"###### Risk Free Rate: {format_percent(trade["risk_free_rate"])}", text_alignment="center")
+                            st.markdown(f"###### Option Type: {trade["option_type"]}", text_alignment="center")
+                    with result_col:
+                            st.markdown(f"##### Market Option Price: {format_currency(trade["option_price"])}", text_alignment="center")
+                            st.markdown(f"##### Your Decision: {trade["action"]} {trade["num_contracts"]} {trade["option_type"]} Contracts", text_alignment="center")
+                            st.markdown(f"##### Result: :green[+{format_currency(trade["profit_loss"])}] ", text_alignment="center")
+                            st.markdown(f"{trade["result"]}", text_alignment="center")
+                            st.markdown(f"{trade["lesson"]}", text_alignment="center")
+                    footer_container = st.container(border=True)
+                    with footer_container:
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.caption(f"Difficulty: {trade["difficulty"]}", text_alignment="center")
+                        with col2:
+                            st.caption(f"Bank Balance: {format_currency(trade["ending_bank"])}", text_alignment="center")
+                        with col3:
+                            st.caption(f"Category: {trade["category"]}", text_alignment="center")
+            elif trade["profit_loss"] < 0:
+                with st.expander(f"Scenario {i+1}: {trade['ticker']} {trade["option_type"]} Option {trade['action']}: :red[-{format_currency(abs(trade["profit_loss"]))}]"):
+                    st.subheader(f"{trade["title"]} ({trade["date"]})", text_alignment="center")
+                    st.markdown(f" ##### {trade["description"]}", text_alignment="center")
+                    spec_col, result_col = st.columns([1, 2.5], border=True)
+                    with spec_col:
+                            st.markdown(f" ##### Option Specifications:", text_alignment="center")
+                            st.markdown(f"###### Stock Price: {format_currency(trade["stock_price"])}", text_alignment="center")
+                            st.markdown(f"###### Strike Price: {format_currency(trade["strike_price"])}", text_alignment="center")
+                            st.markdown(f"###### Time Till Expiry (Months): {trade["time_till_expiry"]}", text_alignment="center")
+                            st.markdown(f"###### Volatility: {format_percent(trade["volatility"])}", text_alignment="center")
+                            st.markdown(f"###### Risk Free Rate: {format_percent(trade["risk_free_rate"])}", text_alignment="center")
+                            st.markdown(f"###### Option Type: {trade["option_type"]}", text_alignment="center")
+                    with result_col:
+                            st.markdown(f"##### Market Option Price: {format_currency(trade["option_price"])}", text_alignment="center")
+                            st.markdown(f"##### Your Decision: {trade["action"]} {trade["num_contracts"]} {trade["option_type"]} Contracts", text_alignment="center")
+                            st.markdown(f"##### Result: :red[-{format_currency(abs(trade["profit_loss"]))}] ", text_alignment="center")
+                            st.markdown(f"{trade["result"]}", text_alignment="center")
+                            st.markdown(f"{trade["lesson"]}", text_alignment="center")
+                    footer_container = st.container(border=True)
+                    with footer_container:
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.caption(f"Difficulty: {trade["difficulty"]}", text_alignment="center")
+                        with col2:
+                            st.caption(f"Bank Balance: {format_currency(trade["ending_bank"])}", text_alignment="center")
+                        with col3:
+                                st.caption(f"Category: {trade["category"]}", text_alignment="center")
+
+            else:
+                with st.expander(f"Scenario {i+1}: {trade['ticker']} {trade["option_type"]} Option {trade['action']}: {format_currency(trade["profit_loss"])}"):
+                    st.subheader(f"{trade["title"]} ({trade["date"]})", text_alignment="center")
+                    st.markdown(f" ##### {trade["description"]}", text_alignment="center")
+                    spec_col, result_col = st.columns([1, 2.5], border=True)
+                    with spec_col:
+                            st.markdown(f" ##### Option Specifications:", text_alignment="center")
+                            st.markdown(f"###### Stock Price: {format_currency(trade["stock_price"])}", text_alignment="center")
+                            st.markdown(f"###### Strike Price: {format_currency(trade["strike_price"])}", text_alignment="center")
+                            st.markdown(f"###### Time Till Expiry (Months): {trade["time_till_expiry"]}", text_alignment="center")
+                            st.markdown(f"###### Volatility: {format_percent(trade["volatility"])}", text_alignment="center")
+                            st.markdown(f"###### Risk Free Rate: {format_percent(trade["risk_free_rate"])}", text_alignment="center")
+                            st.markdown(f"###### Option Type: {trade["option_type"]}", text_alignment="center")
+                    with result_col:
+                            st.markdown(f"##### Market Option Price: {format_currency(trade["option_price"])}", text_alignment="center")
+                            st.markdown(f"##### Your Decision: {trade["action"]} {trade["num_contracts"]} {trade["option_type"]} Contracts", text_alignment="center")
+                            st.markdown(f"##### Result: :grey[{format_currency(trade["profit_loss"])}] ", text_alignment="center")
+                            st.markdown(f"{trade["result"]}", text_alignment="center")
+                            st.markdown(f"{trade["lesson"]}", text_alignment="center")
+                    footer_container = st.container(border=True)
+                    with footer_container:
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.caption(f"Difficulty: {trade["difficulty"]}", text_alignment="center")
+                        with col2:
+                            st.caption(f"Bank Balance: {format_currency(trade["ending_bank"])}", text_alignment="center")
+                        with col3:
+                            st.caption(f"Category: {trade["category"]}", text_alignment="center")
+
+        button_container = st.container(horizontal_alignment="center")
+        with button_container:
+            again_col, resources_col = st.columns(2)
+            with again_col:
+                if st.button("Play Again!", type="primary", use_container_width=True):
+                    st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
+                    st.session_state.quiz_position = 0
+                    scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
+                    current_scenario = quiz_df.loc[scenario_index]
+                    st.session_state.bank_value = 10000
+                    st.session_state.bs_price = None
+                    st.session_state.mc_price = None
+                    st.session_state.quiz_submitted = False
+                    st.session_state.last_action = None # Tracks take or skip
+                    st.session_state.chosen_contracts = 0
+                    st.session_state.quiz_history = [{} for _ in range(5)]
+                    st.rerun()
+
+            with resources_col:
+                if st.button("Go to Resources!", type="primary", use_container_width=True):
+                    st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
+                    st.session_state.quiz_position = 0
+                    scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
+                    current_scenario = quiz_df.loc[scenario_index]
+                    st.session_state.bank_value = 10000
+                    st.session_state.bs_price = None
+                    st.session_state.mc_price = None
+                    st.session_state.quiz_submitted = False
+                    st.session_state.last_action = None # Tracks take or skip
+                    st.session_state.chosen_contracts = 0
+                    st.session_state.quiz_history = [{} for _ in range(5)]
+                    st.session_state.page = "Resources"
+                    st.rerun()
     else:
         scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
         current_scenario = quiz_df.loc[scenario_index]
-
         if st.session_state.quiz_submitted:
             display_summary_scene(current_scenario)
         else:
             display_quiz_scenario(current_scenario)
-    
-
-    # st.write(f"Loaded {len(quiz_df)} scenarios.")
-    # st.write(quiz_df.iloc[0]["title"])
-
-
-
-    # if st.session_state.quiz_position >= 5:
-    #     display_final_screen()
-
-    # else:
-    #     scenario_index = st.session_state.quiz_indices[st.session_state.quiz_position]
-    #     current_scenario = quiz.df.loc[scenario_index]
-    #     display_quiz_scenario(scenario)
-
-    # def display_quiz_scenario(scenario):
-        
-    # def display_final_screen():
-    #     card_container = st.container(border=True)
-    #     with card_container:
-    #             if st.session_state.bank > 10000:
-    #                 st.header("Congratulations!", text_alignment="center")
-    #                 st.space("small")
-    #                 st.subheader(f"Final Balance: {format_currency(st.session_state.bank)}", text_alignment="center")
-    #                 st.markdown(f"Your options pricing knowledge made you: {format_currency(st.session_state.bank - 10000)}", text_alignment="center")
-    #             again_col, resources_col = st.columns(2)
-    #             with again_col:
-    #                 with st.container(horizontal_alignment="center"):
-    #                     if st.button("Play Again!", use_container_width=True):
-    #                             st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
-    #                             st.session_state.quiz_position = 0
-    #                             st.session_state.bank = 10000
-    #                             st.session_state.quiz_answered = False
-    #                             st.rerun()
-    #             with resources_col:
-    #                 with st.container(horizontal_alignment="center"):
-    #                     if st.button("Go to Resources!", use_container_width=True):
-    #                         st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
-    #                         st.session_state.quiz_position = 0
-    #                         st.session_state.bank = 10000
-    #                         st.session_state.quiz_answered = False
-    #                         st.session_state.page = "Resources"
-    #                         st.rerun()
-    #             if st.session_state.bank <= 10000:
-    #                 st.header("Great Effort!", text_alignment="center")
-    #                 st.space("small")
-    #                 st.subheader(f"Final Balance: {format_currency(st.session_state.bank)}", text_alignment="center")
-
-                        
-
-
-
-
-#         1. Load CSV
-# 2. Initialize quiz round: choose 5 scenarios
-# 3. If quiz_position >= 5:
-#        show final balance
-#    Else:
-#        show current scenario
-# 4. User chooses take or skip
-# 5. If take, user chooses investment amount
-# 6. Reveal outcome and update bank
-# 7. User clicks next scenario
-# 8. After 5 questions, show final result
-
-# Step 1: Load CSV successfully
-# Step 2: Display the first scenario from the CSV
-# Step 3: Add quiz_position so you can move through scenarios
-# Step 4: Limit one quiz to 5 selected scenarios
-# Step 5: Add bank balance
-# Step 6: Add take/skip decision
-# Step 7: Add final balance screen after 5 questions
-
-
-# CSV_PATH = Path("data/real_world_option_quiz_scenarios.csv")
-
-# @st.cache_data
-# def load_quiz_data():
-#     return pd.read_csv(CSV_PATH)
-
-#     quiz_df = load_quiz_data()
-    
-#     if "quiz_indices" not in st.session_state:
-#         st.session_state.quiz_indices = quiz_df.sample(5).index.tolist()
-    
-#     if "quiz_position" not in st.session_state:
-#         st.session_state.quiz_position = 0
-
-#     if "bank" not in st.session_state:
-#         st.session_state.bank = 10000
-
-#     if "quiz_answered" not in st.session_state:
-#         st.session_state.quiz_answered = False
