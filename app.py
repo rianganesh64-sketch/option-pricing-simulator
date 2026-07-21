@@ -14,30 +14,36 @@ if "page" not in st.session_state:
 
 
 def display_main():
-    st.title("Welcome to Option-Pricing-Simulator", text_alignment="center")
-    col1, col2 = st.columns(2)
-    col1.header("Rian Ganesh", text_alignment="center")
-    col2.header("Github:", text_alignment="center")
-    col2.markdown("https://github.com/rianganesh64-sketch", text_alignment="center")
+    st.title("OptiLab: Interactive Option Pricing Education", text_alignment="center")
+    st.caption("title in progress", text_alignment="center")
+    st.space("small")
+    st.header("Rian Ganesh", text_alignment="center")
+    st.markdown("Github: https://github.com/rianganesh64-sketch", text_alignment="center")
+    # col2.header("Github:", text_alignment="center")
+    # col2.markdown("https://github.com/rianganesh64-sketch", text_alignment="center")
 
     st.space("medium")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        if st.button("Tutorial"):
+        if st.button("Tutorial", use_container_width=True):
             st.session_state.page = "Tutorial"
             st.rerun()
+        st.caption("_Build foundational knowledge_", text_alignment="center")
     with col2:
-        if st.button("Simulator"):
+        if st.button("Simulator", use_container_width=True):
             st.session_state.page = "Simulator"
             st.rerun()
+        st.caption("_Model prices & run simulations_", text_alignment="center")
     with col3:
-        if st.button("Quiz"):
+        if st.button("Quiz", use_container_width=True):
             st.session_state.page = "Quiz"
             st.rerun()
+        st.caption("_Trade real-world market scenarios_", text_alignment="center")
     with col4:
-        if st.button("Resources"):
+        if st.button("Resources", use_container_width=True):
             st.session_state.page = "Resources"
             st.rerun()
+        st.caption("_Access academic sources & guides_", text_alignment="center")
 
 if st.session_state.page == "Home":
     display_main()

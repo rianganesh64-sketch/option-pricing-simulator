@@ -3,7 +3,14 @@ from ui_components.navbar import display_nav_bar
 
 def display_tutorial():
     display_nav_bar("Home", "Simulator", "Quiz", "Resources")
-    st.space("medium")
+    st.markdown("""
+    <style>
+    div[data-testid="stAlert"] div {
+        text-align: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    st.space("small")
     st.title("Start Learning!", text_alignment="center")
     st.markdown(
         "Understand the basics before testing models in the simulator", text_alignment="center"
@@ -64,7 +71,7 @@ def display_tutorial():
     },
     {
         "title": "Time to Expiration",
-        "body": "Options only last for a limited time. More time usually gives the stock more chance to move, which can make the option more valuable. In this app, users enter time in months, but the model converts it into years.",
+        "body": "Options only last for a limited time. More time usually gives the stock more chance to move, which can make the option more valuable. When an option expires, a trader is forced to exercise it. This means they have to either buy or sell the underlying assest. A trader can only make money if their exercise an in the money option.",
         "definitions": "• **Time to Expiration** — How long the option has before it ends."
         + "\n\n"
         + "• **Time Value** — Value that comes from the possibility of future movement."
@@ -82,7 +89,7 @@ def display_tutorial():
     },
     {
         "title": "Risk-Free Rate",
-        "body": "The risk-free rate is a theoretical interest rate used in pricing models. It helps adjust the value of money over time. In real finance, government bond or Treasury rates are often used as a rough estimate.",
+        "body": "The risk-free rate is a theoretical interest rate you can get without any risk. It helps adjust the value of money over time. In real finance, government bond or Treasury rates are often used as a rough estimate.",
         "definitions": "• **Risk-Free Rate** — A theoretical safe interest rate used in models."
         + "\n\n"
         + "• **Interest Rate** — The cost or reward of borrowing or lending money."
@@ -109,7 +116,7 @@ def display_tutorial():
     },
     {
         "title": "What Is GBM?",
-        "body": "GBM stands for Geometric Brownian Motion. It is a model used to create possible future stock price paths. The GBM graph does not show one guaranteed future. It shows several possible futures that help explain how Monte Carlo simulation works.",
+        "body": "GBM stands for Geometric Brownian Motion. It is a model used to create possible future stock price paths. The GBM graph does not show one guaranteed future. It shows several possible futures that the Monte Carlo simulation uses to price options.",
         "definitions": "• **GBM** — A model for simulating possible stock price movements."
         + "\n\n"
         + "• **Path** — One possible future movement of the stock."
@@ -160,53 +167,52 @@ def display_tutorial():
     def display_card(card):
         card_container = st.container(border=True)
         with card_container:
-            col1, col2, col3 = st.columns([1, 6.5, 1])
+            col1, col2, col3 = st.columns([0.25, 10, 0.25])
             with col2:
                 st.markdown(f"###### Card {st.session_state.card_index + 1} of {len(tutorial_cards)}", text_alignment="center")
                 st.title(card["title"], text_alignment="center")
                 st.markdown("##### " + card["body"], text_alignment="center")
                 st.space("xxsmall")
                 st.markdown("#### **Important Definitions:**", text_alignment="center")
-                st.info(
-                card["definitions"])
+                left_col, info_col, right_col = st.columns([1, 4, 1])
+                with info_col:
+                    st.info(card["definitions"])
 
     current_card = tutorial_cards[st.session_state.card_index]
 
     is_last_card = st.session_state.card_index == len(tutorial_cards) - 1
 
-    card_col1, card_col, card_col3 = st.columns([1, 2.5, 1])
-    with card_col:
-        display_card(current_card)
-        if not is_last_card:
-            if st.session_state.card_index == 0:
-                left_col, button_col, right_col = st.columns([1, 2.5, 1])
-                with button_col:
-                    with st.container(horizontal_alignment="center"):
-                        if st.button("Let's go!", use_container_width=True):
-                            st.session_state.card_index += 1
-                            st.rerun()
-            else:
-                left_button_col, right_button_col = st.columns(2)
-                with left_button_col:
-                    with st.container(horizontal_alignment="center"):
-                        if st.button("⟵ Previous", use_container_width=True):
-                            st.session_state.card_index -= 1
-                            st.rerun()
-                with right_button_col:
-                    with st.container(horizontal_alignment="center"):
-                        if st.button("Next ⟶", use_container_width=True):
-                            st.session_state.card_index += 1
-                            st.rerun()
+    display_card(current_card)
+    if not is_last_card:
+        if st.session_state.card_index == 0:
+            left_col, button_col, right_col = st.columns([1, 2.5, 1])
+            with button_col:
+                with st.container(horizontal_alignment="center"):
+                    if st.button("Let's go!", use_container_width=True, type="primary"):
+                        st.session_state.card_index += 1
+                        st.rerun()
         else:
-            restart_col, exit_col = st.columns(2)
-            with restart_col:
+            left_button_col, right_button_col = st.columns(2)
+            with left_button_col:
                 with st.container(horizontal_alignment="center"):
-                    if st.button("Restart Tutorial", use_container_width=True):
-                        st.session_state.card_index = 0
+                    if st.button("⟵ Previous", use_container_width=True):
+                        st.session_state.card_index -= 1
                         st.rerun()
-            with exit_col:
+            with right_button_col:
                 with st.container(horizontal_alignment="center"):
-                    if st.button("Done!: Go to simulator", use_container_width=True):
-                        st.session_state.card_index = 0
-                        st.session_state.page = "Simulator"
+                    if st.button("Next ⟶", use_container_width=True, type="primary"):
+                        st.session_state.card_index += 1
                         st.rerun()
+    else:
+        restart_col, exit_col = st.columns(2)
+        with restart_col:
+            with st.container(horizontal_alignment="center"):
+                if st.button("Restart Tutorial", use_container_width=True):
+                    st.session_state.card_index = 0
+                    st.rerun()
+        with exit_col:
+            with st.container(horizontal_alignment="center"):
+                if st.button("Done!: Go to simulator", use_container_width=True):
+                    st.session_state.card_index = 0
+                    st.session_state.page = "Simulator"
+                    st.rerun()
