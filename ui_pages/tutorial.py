@@ -2,7 +2,7 @@ import streamlit as st
 from ui_components.navbar import display_nav_bar
 
 def display_tutorial():
-    display_nav_bar("Home", "Simulator", "Quiz", "Resources")
+    display_nav_bar("Home", "Simulator", "Quiz", "Math", "Resources")
     st.markdown("""
     <style>
     div[data-testid="stAlert"] div {

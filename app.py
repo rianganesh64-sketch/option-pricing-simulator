@@ -5,6 +5,7 @@ from ui_pages.tutorial import display_tutorial
 from ui_pages.simulator import display_simulator
 from ui_pages.quiz import display_quiz
 from ui_pages.resources import display_resources
+from ui_pages.math import display_math
 
 st.set_page_config(layout="wide")
 
@@ -19,11 +20,9 @@ def display_main():
     st.space("small")
     st.header("Rian Ganesh", text_alignment="center")
     st.markdown("Github: https://github.com/rianganesh64-sketch", text_alignment="center")
-    # col2.header("Github:", text_alignment="center")
-    # col2.markdown("https://github.com/rianganesh64-sketch", text_alignment="center")
 
     st.space("medium")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         if st.button("Tutorial", use_container_width=True):
             st.session_state.page = "Tutorial"
@@ -44,6 +43,11 @@ def display_main():
             st.session_state.page = "Resources"
             st.rerun()
         st.caption("_Access academic sources & guides_", text_alignment="center")
+    with col5:
+        if st.button("Math", use_container_width=True):
+            st.session_state.page = "Math"
+            st.rerun()
+        st.caption("_Uncover Option Pricing Mathematics_", text_alignment="center")
 
 if st.session_state.page == "Home":
     display_main()
@@ -58,3 +62,6 @@ elif st.session_state.page == "Quiz":
 
 elif st.session_state.page == "Resources":
     display_resources()
+
+elif st.session_state.page == "Math":
+    display_math()

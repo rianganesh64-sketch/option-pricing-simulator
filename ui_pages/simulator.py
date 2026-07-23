@@ -28,7 +28,7 @@ def display_simulator():
     if "gbm_paths" not in st.session_state:
         st.session_state.gbm_paths = None
 
-    display_nav_bar("Home", "Tutorial", "Quiz", "Resources")
+    display_nav_bar("Home", "Tutorial", "Quiz", "Math", "Resources")
     st.space("small")
     st.title("Welcome to the Simulator!", text_alignment="center")
     st.markdown("### Experiment with different option inputs and compare how Black-Scholes and Monte Carlo prices change.", text_alignment="center")

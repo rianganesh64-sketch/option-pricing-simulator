@@ -14,7 +14,7 @@ def load_quiz_data():
     return pd.read_csv(CSV_PATH)
 
 def display_quiz():
-    display_nav_bar("Home", "Tutorial", "Simulator", "Resources")
+    display_nav_bar("Home", "Tutorial", "Simulator", "Math", "Resources")
     # st.space("small")
     # st.title("Quiz", text_alignment="center")
     # st.markdown("### Test your knowledge with real world scenarios!", text_alignment="center")
