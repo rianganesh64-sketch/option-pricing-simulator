@@ -1,5 +1,12 @@
 # Option Pricing Simulator (README not up to date)
 
+For now to run:
+Install dependencies and run:
+```bash
+streamlit run app.py
+```
+
+
 ## Purpose
 
 Option Pricing Simulator is a Python project that explores how financial options are valued. The project implements multiple pricing methods and stock-price simulations to help users understand the mathematics behind option pricing.
