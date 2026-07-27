@@ -30,62 +30,46 @@ def display_simulator():
 
     display_nav_bar("Home", "Tutorial", "Quiz", "Math", "Resources")
     st.space("small")
-    st.title("Welcome to the Simulator!", text_alignment="center")
-    st.markdown("### Experiment with different option inputs and compare how Black-Scholes and Monte Carlo prices change.", text_alignment="center")
+    st.title("Simulator", text_alignment="center")
+    st.markdown("### Experiment with option inputs to visualize their impact on Black-Scholes and Monte-Carlo option pricing.", text_alignment="center")
     st.space("small")
-    input_col, divider_col, output_col = st.columns([1.2, 0.05, 2.5])
+    input_col, output_col = st.columns([1.2, 2.5], border=True)
     with input_col:
             st.header("Inputs", text_alignment="center")
             st.space("medium")
             stock_input = st.number_input(
                 "Enter Current Stock Price:", min_value = 0.01, value=100.00)
             st.write("Entered Stock Price: ", stock_input)
-            st.space("xxsmall")
             strike_input = st.number_input(
                 "Enter Option Strike Price:", min_value = 0.01, value=110.00
             )
             st.write("Entered Strike Price:", strike_input)
-            st.space("xxsmall")
             exp_time = st.slider("How long until the Option expires? (months)", 1, 60, value=12)
             st.write("Entered Time Till Expiration:", exp_time)
-            st.space("xxsmall")
             volatility = st.slider("Stock Volatility (%):", 0.01, 100.00, value=15.00)
             st.write("Entered Stock Volatility:", volatility,"%")
-            st.space("xxsmall")
             risk_free_rate_input = st.slider("Risk-free Rate (%)", 0.00, 15.00, step=0.25)
             st.write("Entered Risk-free rate:", risk_free_rate_input,"%")
-            st.space("xxsmall")
             num_simulations = st.slider("Number of Monte-carlo simulations", 100, 100000, step = 100)
             st.write("Entered Number of Simulations:", num_simulations)
             st.caption("Lower simulation counts usually create noisier, less stable estimates. More simulations can improve accuracy, but they also take longer to run. Try changing this value and see what happens!", text_alignment="center")
-            st.space("xxsmall")
             num_paths = st.slider("How many GBM Paths to Generate?", 1, 10, value=5)
             st.write("Number of Displayed GBM Paths:", num_paths)
-            st.space("xxsmall")
+
             selected_option = st.radio(
-                "Call or Put Option?:",
+                "Call or Put Option?",
                 ["Call", "Put"],
                 horizontal=True
             )
-            st.space("xxsmall")
             submit_bs, submit_mc = st.columns(2)
             with submit_bs:
                 submitted_bs = st.button("Run Black Scholes", use_container_width=True)
             with submit_mc:
                 submitted_mc = st.button("Run Monte Carlo Simulation", use_container_width=True)
-    
-    with divider_col:
-      st.html(
-          """
-          <div class="vertical-divider"></div>
-          """)
     with output_col:
         st.header("Outputs", text_alignment="center")
         if submitted_bs==False and submitted_mc==False:
-            st.space('xxlarge')
-            st.subheader("Start changing input values to get started:", text_alignment="center")
-            st.space("large")
-            st.subheader('Click "Run Black Scholes" or "Run Monte Carlo Simulation" to see the outputs!', text_alignment="center")
+            st.subheader('Click "Run Black Scholes" or "Run Monte Carlo Simulation" to visualize the outputs', text_alignment="center")
         if submitted_bs==True:
             S = stock_input
             K = strike_input
@@ -95,7 +79,7 @@ def display_simulator():
             option_type = selected_option.strip().lower()
             bs_price = black_scholes_price(S, K, T, r, sigma, option_type)
             st.session_state.bs_price = bs_price
-        st.space("medium")
+        st.space("xsmall")
         if submitted_mc==True:
             S = stock_input
             K = strike_input
@@ -127,15 +111,14 @@ def display_simulator():
             option_type = selected_option.strip().lower()
             absolute_err = absolute_error(round(st.session_state.bs_price, 2), round(st.session_state.mc_price, 2))
             per_error = percent_error(round(st.session_state.bs_price, 2), round(st.session_state.mc_price, 2))
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"Absolute Error (Difference Between Prices): ${round(absolute_err, 2)}", text_alignment="right")
-            with col2:
+            metrics_container = st.container(horizontal_alignment="center")
+            with metrics_container:
+                st.markdown(f"Absolute Error (Difference Between Prices): ${round(absolute_err, 2)}", text_alignment="center")
                 if st.session_state.bs_price == 0.00:
-                    st.markdown("Percent Error: Undefined (Black-Scholes Price is 0)", text_alignment="left")
+                    st.markdown("Percent Error: Undefined (Black-Scholes Price is 0)", text_alignment="center")
                 else:
-                    st.markdown(f"Percent Error: {format_percent(per_error)}", text_alignment="left")
-            st.space("medium")
+                    st.markdown(f"Percent Error: {format_percent(per_error)}", text_alignment="center")
+                st.space("small")
             if st.session_state.gbm_paths is not None:
                 fig, ax = plt.subplots(figsize = (5,2.9166))
                 
@@ -147,3 +130,13 @@ def display_simulator():
                 ax.set_ylabel("Stock Price")
                 st.pyplot(fig, use_container_width=True)
                 st.caption("This graph visualizes potential prices of the underlying stock using Geometric Brownian Motion. A Monte Carlo simulation can run a lot of these to get an average future stock price. It uses this price to calculate the value of an option.", text_alignment="center")
+    st.space('small')
+    exit_container = st.container(horizontal_alignment="center")
+    with exit_container:
+        if st.button("Done? Go to Quiz", type="primary", width=1000):
+            st.session_state.bs_price = None
+            st.session_state.mc_price = None
+            st.session_state.mc_runtime = None
+            st.session_state.gbm_path = None
+            st.session_state.page = "Quiz"
+            st.rerun()
